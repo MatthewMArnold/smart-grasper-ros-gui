@@ -3,7 +3,7 @@ import QtQuick.Controls 2.2
 import Ros 1.0
 
 ApplicationWindow {
-    property int screenHeight: 800
+    property int screenHeight: 850
     property int screenWidth: 1048
     property int screenMargin: 32
     property int componentMargin: 8
@@ -13,6 +13,7 @@ ApplicationWindow {
     property double temperature: 0
     property double velocityOfSound: 0
     property double oxygen: 0
+    property double impedence: 0
 
     id: window
     title: "grasper-gui"
@@ -31,6 +32,7 @@ ApplicationWindow {
     signal onTemperatureRequestChanged(bool temperatureRequested)
     signal onForceRequestChanged(bool forceRequested)
     signal onVelocityOfSoundRequestChanged(bool velocityOfSoundRequested)
+    signal onImpedenceRequestChanged(bool impedenceRequested)
 
     // TODO phase + magnitude
 
@@ -72,8 +74,6 @@ ApplicationWindow {
                     motorControlPanel.onMotorControlDisabled()
                     sensorControlPanel.disableAll()
                 }
-
-                runSensorsText.color = runAllSensorsButtonShadow.color
             }
 
             onReleased: onAllSensorsReleased()
@@ -150,13 +150,17 @@ ApplicationWindow {
                 id: sensorControlPanel
                 y: 359
                 width: parent.width
-                height: 220
+                height: pulseOxRow.height +
+                        temperatureRow.height +
+                        forceSwitchRow.height +
+                        velocityOfSoundRow.height +
+                        impedenceRow.height
+
                 color: "#2d2d57"
                 radius: 16
                 border.width: 0
 
                 function enableAll() {
-                    console.log(pulseOxSwitch.position)
                     if (pulseOxSwitch.position === 0) {
                         pulseOxSwitch.toggle()
                     }
@@ -169,21 +173,27 @@ ApplicationWindow {
                     if (velocityOfSoundSwitch.position === 0) {
                         velocityOfSoundSwitch.toggle()
                     }
+                    if (impedenceSwitch.position === 0) {
+                        impedenceSwitch.toggle()
+                    }
 
                     onForceRequestChanged(true)
                     onTemperatureRequestChanged(true)
                     onPulseOxRequestChanged(true)
                     onVelocityOfSoundRequestChanged(true)
+                    onImpedenceRequestChanged(true)
 
                     pulseOxSwitch.enabled = false
                     temperatureSwitch.enabled = false
                     forceSwitch.enabled = false
                     velocityOfSoundSwitch.enabled = false
+                    impedenceSwitch.enabled = false
 
                     pulseOxText.opacity = 0.5
                     temperatureSwitchText.opacity = 0.5
                     forceText.opacity = 0.5
                     velocitySwitchText.opacity = 0.5
+                    impedenceSwitchText.opacity = 0.5
                 }
 
                 function disableAll() {
@@ -199,24 +209,31 @@ ApplicationWindow {
                     if (velocityOfSoundSwitch.position === 1) {
                         velocityOfSoundSwitch.toggle()
                     }
-                    if (forceSwitch.position === 0) {
+                    if (forceSwitch.position === 1) {
                         forceSwitch.toggle()
+                    }
+                    if (impedenceSwitch.position === 1) {
+                        impedenceSwitch.toggle()
                     }
 
                     onForceRequestChanged(false)
                     onTemperatureRequestChanged(false)
                     onPulseOxRequestChanged(false)
                     onVelocityOfSoundRequestChanged(false)
+                    onImpedenceRequestChanged(false)
 
                     pulseOxSwitch.enabled = true
                     temperatureSwitch.enabled = true
                     forceSwitch.enabled = true
                     velocityOfSoundSwitch.enabled = true
+                    impedenceSwitch.enabled = true
 
                     pulseOxText.opacity = 1
                     temperatureSwitchText.opacity = 1
                     forceText.opacity = 1
                     velocitySwitchText.opacity = 1
+                    impedenceSwitch.opacity = 1
+                    impedenceSwitchText.opacity = 1
                 }
 
                 Row {
@@ -337,6 +354,35 @@ ApplicationWindow {
                         }
                     }
                 }
+
+                Row {
+                    id: impedenceRow
+
+                    anchors.right: parent.right
+                    anchors.rightMargin: 0
+                    anchors.top: velocityOfSoundRow.bottom
+                    anchors.topMargin: 0
+
+                    Text {
+                        id: impedenceSwitchText
+                        text: "Impedence"
+                        horizontalAlignment: Text.AlignRight
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: "#ffffff"
+                        width: parent.width / 2
+                    }
+
+                    SwitchDelegate {
+                        id: impedenceSwitch
+                        onToggled: {
+                            if (position === 0) {
+                                onImpedenceRequestChanged(false)
+                            } else {
+                                onImpedenceRequestChanged(true)
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -379,7 +425,7 @@ ApplicationWindow {
             Rectangle {
                 id: motorControlPanel
                 width: parent.width
-                height: 220
+                height: sensorControlPanel.height
                 color: "#2d2d57"
                 radius: 16
                 border.width: 0
@@ -536,8 +582,8 @@ ApplicationWindow {
             width: 240
             height: actualForceText.height + actualForceDisplay.height +
                     spacer1.height + velocityOfSoundDisplay.height + velocityOfSoundText.height +
-                    spacer2.height + magnitudeDisplay.height + magnitudeText.height + 8 * 7
-            spacing: 8
+                    spacer2.height + magnitudeDisplay.height + magnitudeText.height + 10 * 7
+            spacing: 10
 
             Text {
                 id: actualForceText
@@ -656,14 +702,14 @@ ApplicationWindow {
             width: 240
             height: temperatureText.height + temperatureDisplay.height +
                     spacer3.height + oxygenText.height + oxygenDisplay.height +
-                    spacer4.height + phaseText.height + phaseText.width + 8 * 7
+                    spacer4.height + phaseText.height + phaseText.width + 10 * 7
 
             anchors.left: sensorReadingsLeftCol.right
             anchors.leftMargin: componentMargin
             anchors.top: sensorReadingsLeftCol.top
             anchors.topMargin: 0
 
-            spacing: 8
+            spacing: 10
 
             Text {
                 id: temperatureText

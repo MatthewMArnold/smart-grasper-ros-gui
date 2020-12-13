@@ -1,0 +1,4 @@
+bool enablePulseOx
+bool enableTemperature
+bool enableVelocityOfSound
+bool enableImpedence

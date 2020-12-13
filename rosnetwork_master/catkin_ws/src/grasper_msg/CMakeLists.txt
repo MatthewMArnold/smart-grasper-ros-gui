@@ -53,6 +53,7 @@ add_message_files(
   MotorRequestMessage.msg
   MotorDebugMessageFeedback.msg
   MotorMessageFeedback.msg
+  SensorRequestMessage.msg
 )
 
 ## Generate services in the 'srv' folder

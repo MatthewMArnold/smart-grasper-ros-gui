@@ -35,6 +35,7 @@ void ThermistorWorker::setMeasureTemperature(bool measureTemperature)
     if (m_measureTemperature != measureTemperature)
     {
         m_measureTemperature = measureTemperature;
+        MainController::getInstance()->setEnableTemperature(measureTemperature);
         emit onMeasureTemperatureChanged(m_measureTemperature);
     }
 }

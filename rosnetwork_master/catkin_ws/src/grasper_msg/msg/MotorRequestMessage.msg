@@ -1,2 +1,3 @@
-float32 angle
 float32 appliedForce
+bool enableMotorController
+bool measureForce

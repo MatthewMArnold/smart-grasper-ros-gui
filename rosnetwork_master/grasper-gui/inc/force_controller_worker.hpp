@@ -5,6 +5,7 @@
 #include <QQmlApplicationEngine>
 #include <QThread>
 #include <QString>
+#include <QMutex>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <grasper_msg/MotorMessageFeedback.h>
@@ -51,7 +52,7 @@ public slots:
     void setMeasureForceRequest(bool measureForceRequest);
 
 signals:
-    void onForceDesiredChanged(QVariant force);
+    void onForceDesiredChanged(double force);
     void onForceActualChanged(QVariant force);
     void onSqueezeChanged(bool squeeze);
     void onMeasureForceRequestChanged(QVariant measureForceRequest);
@@ -61,8 +62,14 @@ private:
     double m_forceActual = 10.0f;
     bool m_squeeze = false;
     bool m_measureForceRequest = false;
+    ros::Publisher motorRequestPub;
+    QMutex requestMutex;
 
     void run() override;
+
+    void sendMotorRequest(double force,
+                          bool enableMotorController,
+                          bool measureForce);
 };
 
 #endif  // FORCE_CONTROLLER_WORKER_HPP_

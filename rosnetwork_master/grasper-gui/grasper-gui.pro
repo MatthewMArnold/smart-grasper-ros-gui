@@ -21,8 +21,8 @@ SOURCES += \
     src/main_controller.cpp \
     src/force_controller_worker.cpp \
     src/thermistor_worker.cpp \
-    src/ultrasound_worker.cpp \
-    src/pulseox_worker.cpp
+    src/pulseox_worker.cpp \
+    src/ultrasonic_worker.cpp
 
 INCLUDEPATH += inc
 
@@ -30,8 +30,8 @@ HEADERS += \
     inc/main_controller.hpp \
     inc/force_controller_worker.hpp \
     inc/thermistor_worker.hpp \
-    inc/ultrasound_worker.hpp \
-    inc/pulseox_worker.hpp
+    inc/pulseox_worker.hpp \
+    inc/ultrasonic_worker.hpp
 
 RESOURCES += \
     resources.qrc
