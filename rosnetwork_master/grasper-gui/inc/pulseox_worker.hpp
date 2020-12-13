@@ -1,0 +1,4 @@
+#ifndef PULSEOX_WORKER_HPP
+#define PULSEOX_WORKER_HPP
+
+#endif // PULSEOX_WORKER_HPP

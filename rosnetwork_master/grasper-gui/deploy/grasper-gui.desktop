@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=grasper-gui
+GenericName=grasper-gui
+Comment=grasper-gui Comment
+Icon=icon
+Exec=grasper-gui
+Terminal=false
+Categories=Utility;
+Keywords=computer;
