@@ -16,6 +16,8 @@ void PulseoxWorker::addConnections(QObject *root)
     QObject::connect(root, SIGNAL(onPulseOxRequestChanged(bool)),
                      this, SLOT(setMeasurePulseox(bool)),
                      Qt::DirectConnection);
+    QObject::connect(this, SIGNAL(onMeasurePulseoxChanged(bool)),
+                     MainController::getInstance(), SLOT(setEnablePulseOx(bool)));
 }
 
 void PulseoxWorker::setOxygenLevel(double oxygenLevel)
@@ -35,7 +37,6 @@ void PulseoxWorker::setMeasurePulseox(bool measurePulseox)
     if (m_measurePulseox != measurePulseox)
     {
         m_measurePulseox = measurePulseox;
-        MainController::getInstance()->setEnablePulseOx(measurePulseox);
         emit onMeasurePulseoxChanged(m_measurePulseox);
     }
 }
@@ -47,20 +48,4 @@ void PulseoxWorker::run()
     if (n == nullptr) return;
 
     Q_UNUSED(n);
-
-    ros::Rate loopRate(10);
-
-    int count = 0;
-    while (ros::ok())
-    {
-        // TODO replace all this with real stuff eventually
-        if (count % 10 == 1)
-        {
-            setOxygenLevel(count);
-        }
-        ++count;
-
-        ros::spinOnce();
-        loopRate.sleep();
-    }
 }

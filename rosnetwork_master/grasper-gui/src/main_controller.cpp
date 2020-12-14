@@ -7,6 +7,7 @@
 #include "thermistor_worker.hpp"
 #include "pulseox_worker.hpp"
 #include "ultrasonic_worker.hpp"
+#include "bioimpedance_worker.hpp"
 
 void SensorRequestWorker::run()
 {
@@ -56,10 +57,14 @@ MainController::~MainController()
     sendSensorRequestThread.quit();
     sendSensorRequestThread.wait();
 
+    bioimpedanceThread.quit();
+    bioimpedanceThread.wait();
+
     delete forceController;
     delete thermistor;
     delete pulseox;
     delete ultrasonic;
+    delete bioimpedance;
     delete sensorRequest;
 }
 
@@ -71,6 +76,7 @@ void MainController::initialize(QQmlApplicationEngine *engine)
     thermistor = new ThermistorWorker();
     pulseox = new PulseoxWorker();
     ultrasonic = new UltrasonicWorker();
+    bioimpedance = new BioimpedanceWorker();
     sensorRequest = new SensorRequestWorker();
 
     engine->rootContext()->setContextProperty("forceController", forceController);
@@ -85,6 +91,7 @@ void MainController::addConnections(QObject *root)
     thermistor->addConnections(root);
     ultrasonic->addConnections(root);
     pulseox->addConnections(root);
+    bioimpedance->addConnections(root);
 
     connect(&forceControllerThread, &QThread::finished, forceController, &QObject::deleteLater);
     forceController->moveToThread(&forceControllerThread);
@@ -101,6 +108,10 @@ void MainController::addConnections(QObject *root)
     connect(&ultrasonicThread, &QThread::finished, ultrasonic, &QObject::deleteLater);
     ultrasonic->moveToThread(&ultrasonicThread);
     ultrasonic->start();
+
+    connect(&bioimpedanceThread, &QThread::finished, bioimpedance, &QObject::deleteLater);
+    bioimpedance->moveToThread(&bioimpedanceThread);
+    bioimpedance->start();
 
     connect(&sendSensorRequestThread, &QThread::finished, sensorRequest, &QObject::deleteLater);
     sensorRequest->moveToThread(&sendSensorRequestThread);
@@ -123,7 +134,6 @@ void MainController::setEnableTemperature(bool enabled)
 
 void MainController::setEnableVelocityOfSound(bool enabled)
 {
-    qDebug() << "##### " << enabled;
     sensorRequestLock.lock();
     sensorRequestMessage.enableVelocityOfSound = enabled;
     sensorRequestLock.unlock();

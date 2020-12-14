@@ -12,6 +12,7 @@ class ForceControllerWorker;
 class ThermistorWorker;
 class PulseoxWorker;
 class UltrasonicWorker;
+class BioimpedanceWorker;
 
 /**
  * Thread that publishes sensor requests to '/serial/sensorEnable'
@@ -51,11 +52,13 @@ public:
 
     QObject *getRoot() { return root; }
 
+    grasper_msg::SensorRequestMessage getSensorRequestMsg();
+
+public slots:
     void setEnablePulseOx(bool enabled);
     void setEnableTemperature(bool enabled);
     void setEnableVelocityOfSound(bool enabled);
     void setEnableImpedence(bool enabled);
-    grasper_msg::SensorRequestMessage getSensorRequestMsg();
 
 private:
     static MainController *mainController;
@@ -65,6 +68,7 @@ private:
     ThermistorWorker *thermistor;
     PulseoxWorker *pulseox;
     UltrasonicWorker *ultrasonic;
+    BioimpedanceWorker *bioimpedance;
     SensorRequestWorker *sensorRequest;
 
     // Threads
@@ -72,6 +76,7 @@ private:
     QThread thermistorThread;
     QThread pulseoxThread;
     QThread ultrasonicThread;
+    QThread bioimpedanceThread;
     QThread sendSensorRequestThread;
 
     grasper_msg::SensorRequestMessage sensorRequestMessage;

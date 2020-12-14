@@ -16,6 +16,8 @@ void ThermistorWorker::addConnections(QObject *root)
     QObject::connect(root, SIGNAL(onTemperatureRequestChanged(bool)),
                      this, SLOT(setMeasureTemperature(bool)),
                      Qt::DirectConnection);
+    QObject::connect(this, SIGNAL(onMeasureTemperatureChanged(bool)),
+                     MainController::getInstance(), SLOT(setEnableTemperature(bool)));
 }
 
 void ThermistorWorker::setTemperature(double temperature)
@@ -35,7 +37,6 @@ void ThermistorWorker::setMeasureTemperature(bool measureTemperature)
     if (m_measureTemperature != measureTemperature)
     {
         m_measureTemperature = measureTemperature;
-        MainController::getInstance()->setEnableTemperature(measureTemperature);
         emit onMeasureTemperatureChanged(m_measureTemperature);
     }
 }
@@ -47,20 +48,4 @@ void ThermistorWorker::run()
     if (n == nullptr) return;
 
     Q_UNUSED(n);
-
-    ros::Rate loopRate(10);
-
-    int count = 0;
-    while (ros::ok())
-    {
-        // TODO replace all this with real stuff eventually
-        if (count % 10 == 1)
-        {
-            setTemperature(count);
-        }
-        ++count;
-
-        ros::spinOnce();
-        loopRate.sleep();
-    }
 }

@@ -13,11 +13,6 @@ void ForceControllerWorker::msgCallback(const grasper_msg::MotorMessageFeedback 
     setForceActual(msg.appliedForce);
 }
 
-void ForceControllerWorker::testMsgCallback(const std_msgs::String &msg)
-{
-    Q_UNUSED(msg);
-}
-
 void ForceControllerWorker::setForceDesired(double force)
 {
     qDebug() << "force desired set to: " << force;

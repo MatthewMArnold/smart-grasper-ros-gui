@@ -14,6 +14,8 @@ void UltrasonicWorker::addConnections(QObject *root)
     QObject::connect(root, SIGNAL(onVelocityOfSoundRequestChanged(bool)),
                      this, SLOT(setMeasureVelocityOfSound(bool)),
                      Qt::DirectConnection);
+    QObject::connect(this, SIGNAL(onMeasureVelocityOfSoundChanged(bool)),
+                     MainController::getInstance(), SLOT(setEnableVelocityOfSound(bool)));
 }
 
 void UltrasonicWorker::setVelocityOfSound(double velocityOfSound)
@@ -33,7 +35,6 @@ void UltrasonicWorker::setMeasureVelocityOfSound(bool measureVelocityOfSound)
     if (m_measureVelocityOfSound != measureVelocityOfSound)
     {
         m_measureVelocityOfSound = measureVelocityOfSound;
-        MainController::getInstance()->setEnableVelocityOfSound(measureVelocityOfSound);
         emit onMeasureVelocityOfSoundChanged(m_measureVelocityOfSound);
     }
 }
@@ -45,20 +46,4 @@ void UltrasonicWorker::run()
     if (n == nullptr) return;
 
     Q_UNUSED(n);
-
-    ros::Rate loopRate(10);
-
-    int count = 0;
-    while (ros::ok())
-    {
-        // TODO replace all this with real stuff eventually
-        if (count % 10 == 1)
-        {
-            setVelocityOfSound(count);
-        }
-        ++count;
-
-        ros::spinOnce();
-        loopRate.sleep();
-    }
 }

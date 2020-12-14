@@ -37,7 +37,6 @@ class ForceControllerWorker : public QThread
 
 public:
     void msgCallback(const grasper_msg::MotorMessageFeedback &msg);
-    void testMsgCallback(const std_msgs::String &msg);
     void addConnections(QObject *root);
 
     double forceDesired() const { return m_forceDesired; }
