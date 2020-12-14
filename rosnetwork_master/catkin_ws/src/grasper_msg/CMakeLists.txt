@@ -54,6 +54,11 @@ add_message_files(
   MotorDebugMessageFeedback.msg
   MotorMessageFeedback.msg
   SensorRequestMessage.msg
+  PulseOxRxMessage.msg
+  ThermistorMessage.msg
+  TimestampedFloat.msg
+  UltrasonicDataMessage.msg
+  ImpedanceDataMessage.msg
 )
 
 ## Generate services in the 'srv' folder

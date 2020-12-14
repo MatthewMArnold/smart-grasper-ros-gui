@@ -13,7 +13,7 @@ ApplicationWindow {
     property double temperature: 0
     property double velocityOfSound: 0
     property double oxygen: 0
-    property double impedence: 0
+    property double impedance: 0
 
     id: window
     title: "grasper-gui"
@@ -32,9 +32,7 @@ ApplicationWindow {
     signal onTemperatureRequestChanged(bool temperatureRequested)
     signal onForceRequestChanged(bool forceRequested)
     signal onVelocityOfSoundRequestChanged(bool velocityOfSoundRequested)
-    signal onImpedenceRequestChanged(bool impedenceRequested)
-
-    // TODO phase + magnitude
+    signal onImpedanceRequestChanged(bool impedanceRequested)
 
     Rectangle {
         id: mainScreen
@@ -154,7 +152,7 @@ ApplicationWindow {
                         temperatureRow.height +
                         forceSwitchRow.height +
                         velocityOfSoundRow.height +
-                        impedenceRow.height
+                        impedanceRow.height
 
                 color: "#2d2d57"
                 radius: 16
@@ -173,27 +171,27 @@ ApplicationWindow {
                     if (velocityOfSoundSwitch.position === 0) {
                         velocityOfSoundSwitch.toggle()
                     }
-                    if (impedenceSwitch.position === 0) {
-                        impedenceSwitch.toggle()
+                    if (impedanceSwitch.position === 0) {
+                        impedanceSwitch.toggle()
                     }
 
                     onForceRequestChanged(true)
                     onTemperatureRequestChanged(true)
                     onPulseOxRequestChanged(true)
                     onVelocityOfSoundRequestChanged(true)
-                    onImpedenceRequestChanged(true)
+                    onImpedanceRequestChanged(true)
 
                     pulseOxSwitch.enabled = false
                     temperatureSwitch.enabled = false
                     forceSwitch.enabled = false
                     velocityOfSoundSwitch.enabled = false
-                    impedenceSwitch.enabled = false
+                    impedanceSwitch.enabled = false
 
                     pulseOxText.opacity = 0.5
                     temperatureSwitchText.opacity = 0.5
                     forceText.opacity = 0.5
                     velocitySwitchText.opacity = 0.5
-                    impedenceSwitchText.opacity = 0.5
+                    impedanceSwitchText.opacity = 0.5
                 }
 
                 function disableAll() {
@@ -212,28 +210,28 @@ ApplicationWindow {
                     if (forceSwitch.position === 1) {
                         forceSwitch.toggle()
                     }
-                    if (impedenceSwitch.position === 1) {
-                        impedenceSwitch.toggle()
+                    if (impedanceSwitch.position === 1) {
+                        impedanceSwitch.toggle()
                     }
 
                     onForceRequestChanged(false)
                     onTemperatureRequestChanged(false)
                     onPulseOxRequestChanged(false)
                     onVelocityOfSoundRequestChanged(false)
-                    onImpedenceRequestChanged(false)
+                    onImpedanceRequestChanged(false)
 
                     pulseOxSwitch.enabled = true
                     temperatureSwitch.enabled = true
                     forceSwitch.enabled = true
                     velocityOfSoundSwitch.enabled = true
-                    impedenceSwitch.enabled = true
+                    impedanceSwitch.enabled = true
 
                     pulseOxText.opacity = 1
                     temperatureSwitchText.opacity = 1
                     forceText.opacity = 1
                     velocitySwitchText.opacity = 1
-                    impedenceSwitch.opacity = 1
-                    impedenceSwitchText.opacity = 1
+                    impedanceSwitch.opacity = 1
+                    impedanceSwitchText.opacity = 1
                 }
 
                 Row {
@@ -356,7 +354,7 @@ ApplicationWindow {
                 }
 
                 Row {
-                    id: impedenceRow
+                    id: impedanceRow
 
                     anchors.right: parent.right
                     anchors.rightMargin: 0
@@ -364,8 +362,8 @@ ApplicationWindow {
                     anchors.topMargin: 0
 
                     Text {
-                        id: impedenceSwitchText
-                        text: "Impedence"
+                        id: impedanceSwitchText
+                        text: "Impedance"
                         horizontalAlignment: Text.AlignRight
                         anchors.verticalCenter: parent.verticalCenter
                         color: "#ffffff"
@@ -373,12 +371,12 @@ ApplicationWindow {
                     }
 
                     SwitchDelegate {
-                        id: impedenceSwitch
+                        id: impedanceSwitch
                         onToggled: {
                             if (position === 0) {
-                                onImpedenceRequestChanged(false)
+                                onImpedanceRequestChanged(false)
                             } else {
-                                onImpedenceRequestChanged(true)
+                                onImpedanceRequestChanged(true)
                             }
                         }
                     }
@@ -582,7 +580,7 @@ ApplicationWindow {
             width: 240
             height: actualForceText.height + actualForceDisplay.height +
                     spacer1.height + velocityOfSoundDisplay.height + velocityOfSoundText.height +
-                    spacer2.height + magnitudeDisplay.height + magnitudeText.height + 10 * 7
+                    spacer2.height + impedanceDisplay.height + impedanceText.height + 10 * 7
             spacing: 10
 
             Text {
@@ -668,16 +666,17 @@ ApplicationWindow {
             }
 
             Text {
-                id: magnitudeText
+                id: impedanceText
                 color: "#ffffff"
-                text: qsTr("Magnitude")
+                text: qsTr("Impedance,\nmagnitude/frequency")
+                horizontalAlignment: Text.AlignCenter
                 font.weight: Font.Bold
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: 20
             }
 
             Rectangle {
-                id: magnitudeDisplay
+                id: impedanceDisplay
                 height: 50
                 color: "#d0caf9"
                 radius: 8
@@ -688,7 +687,7 @@ ApplicationWindow {
                     id: text15
                     x: -4
                     y: 51
-                    text: qsTr("99")
+                    text: qsTr("0")
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     font.pixelSize: 20
@@ -702,7 +701,7 @@ ApplicationWindow {
             width: 240
             height: temperatureText.height + temperatureDisplay.height +
                     spacer3.height + oxygenText.height + oxygenDisplay.height +
-                    spacer4.height + phaseText.height + phaseText.width + 10 * 7
+                    10 * 6
 
             anchors.left: sensorReadingsLeftCol.right
             anchors.leftMargin: componentMargin
@@ -774,49 +773,6 @@ ApplicationWindow {
                     x: 109
                     y: -76
                     text: oxygen
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.pixelSize: 20
-                }
-            }
-
-            Rectangle {
-                id: spacer4
-                height: 40
-                color: "#ffffff"
-                radius: 0
-                clip: false
-                visible: true
-                opacity: 0
-                anchors.leftMargin: 0
-                anchors.left: parent.left
-                anchors.right: parent.right
-                border.width: 0
-                anchors.rightMargin: 0
-            }
-
-            Text {
-                id: phaseText
-                color: "#ffffff"
-                text: qsTr("Phase")
-                font.weight: Font.Bold
-                anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: 20
-            }
-
-            Rectangle {
-                id: phaseDisplay
-                height: 50
-                color: "#d0caf9"
-                radius: 8
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: sensorReadingBoxWidth
-
-                Text {
-                    id: text18
-                    x: 109
-                    y: -76
-                    text: qsTr("99")
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.pixelSize: 20

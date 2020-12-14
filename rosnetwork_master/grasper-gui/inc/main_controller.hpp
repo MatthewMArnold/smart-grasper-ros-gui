@@ -58,7 +58,7 @@ public slots:
     void setEnablePulseOx(bool enabled);
     void setEnableTemperature(bool enabled);
     void setEnableVelocityOfSound(bool enabled);
-    void setEnableImpedence(bool enabled);
+    void setEnableImpedance(bool enabled);
 
 private:
     static MainController *mainController;

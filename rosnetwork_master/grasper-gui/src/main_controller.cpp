@@ -28,7 +28,7 @@ void SensorRequestWorker::run()
         if (newMsg.enablePulseOx != oldMsg.enablePulseOx ||
                 newMsg.enableTemperature != oldMsg.enableTemperature ||
                 newMsg.enableVelocityOfSound != oldMsg.enableVelocityOfSound ||
-                newMsg.enableImpedence != oldMsg.enableImpedence)
+                newMsg.enableImpedance != oldMsg.enableImpedance)
         {
             pub.publish(newMsg);
         }
@@ -139,10 +139,10 @@ void MainController::setEnableVelocityOfSound(bool enabled)
     sensorRequestLock.unlock();
 }
 
-void MainController::setEnableImpedence(bool enabled)
+void MainController::setEnableImpedance(bool enabled)
 {
     sensorRequestLock.lock();
-    sensorRequestMessage.enableImpedence = enabled;
+    sensorRequestMessage.enableImpedance = enabled;
     sensorRequestLock.unlock();
 }
 

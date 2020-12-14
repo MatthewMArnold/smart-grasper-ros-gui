@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from grasper_msg.msg import MotorRequestMessage
+from grasper_msg.msg import MotorRequestMessage, SensorRequestMessage
 import rospy
 import serial_handlers
 import serial_parser
@@ -27,7 +27,7 @@ class SerialNode:
         self.socket.sendMessage(data, MOTOR_REQUEST_TX_TYPE)
 
     def sendSensorEnableRequest(self, msg):
-        data = struct.pack("????", msg.enablePulseOx, msg.enableTemperature, msg.enableVelocityOfSound, msg.enableImpedence)
+        data = struct.pack("????", msg.enablePulseOx, msg.enableTemperature, msg.enableVelocityOfSound, msg.enableImpedance)
         self.socket.sendMessage(data, )
 
 if __name__ == '__main__':

@@ -9,11 +9,11 @@ void BioimpedanceWorker::msgCallback(const grasper_msg::MotorMessageFeedback &ms
 
 void BioimpedanceWorker::addConnections(QObject *root)
 {
-    QObject::connect(root, SIGNAL(onImpedenceRequestChanged(bool)),
+    QObject::connect(root, SIGNAL(onImpedanceRequestChanged(bool)),
                      this, SLOT(setImpedanceRequested(bool)),
                      Qt::DirectConnection);
     QObject::connect(this, SIGNAL(onImpedanceRequestedChanged(bool)),
-                     MainController::getInstance(), SLOT(setEnableImpedence(bool)));
+                     MainController::getInstance(), SLOT(setEnableImpedance(bool)));
 }
 
 void BioimpedanceWorker::setImpedance(double impedance)
@@ -21,6 +21,7 @@ void BioimpedanceWorker::setImpedance(double impedance)
     if (m_impedance != impedance)
     {
         m_impedance = impedance;
+        MainController::getInstance()->getRoot()->setProperty("impedance", QVariant(impedance));
         emit onImpedanceChanged(impedance);
     }
 }

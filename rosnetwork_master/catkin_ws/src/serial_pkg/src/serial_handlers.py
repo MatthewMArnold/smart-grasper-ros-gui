@@ -1,4 +1,4 @@
-from grasper_msg.msg import MotorDebugMessageFeedback, MotorMessageFeedback
+from grasper_msg.msg import *
 import rospy
 import struct
 
@@ -20,9 +20,6 @@ class MotorDebugInfoHandler:
         feedback.jawPos = data[3]
         feedback.appliedForce = data[4]
 
-        # rospy.loginfo("motor debug message: enc={0}, straingauge={1}, measured load cell={2}, jawPos={3}, appiledForce={4}"
-        #         .format(feedback.enc, feedback.strainGaugeADC, feedback.measuredStrainGaugeADC, feedback.jawPos, feedback.appliedForce))
-
         self.pub.publish(feedback)
 
 class MotorInfoHandler:
@@ -40,13 +37,79 @@ class MotorInfoHandler:
         feedback.jawPos = data[0]
         feedback.appliedForce = data[1]
 
-        # rospy.loginfo("motor info message: jawPos={0}, appiledForce={1}".format(feedback.jawPos, feedback.appliedForce))
-
         self.pub.publish(feedback)
+
+class ThermistorMessageHandler:
+    def __init__(self):
+        self.pub = rospy.Publisher("serial/thermistorData", ThermistorMessage, queue_size=1)
+
+    def __call__(self, msg):
+        msg = ThermistorMessage()
+        try:
+            for i in len(50):
+                msg.dataPoint.data[i] = struct.unpack("<f", msg[2 * i])
+                msg.dataPoint.time[i] = struct.unpack("<L", msg[2 * (i + 1)])
+        except struct.error as e:
+            rospy.logerr("invalid thermistor data message")
+            return
+
+        self.pub.publish(msg)
+
+class PulseOxMessageHandler:
+    def __init__(self):
+        self.pub = rospy.Publisher("serial/pulseOxData", PulseOxRxMessage, queue_size=1)
+
+    def __call__(self, msg):
+        msg = PulseOxRxMessage()
+        try:
+            for i in len(50):
+                msg.dataPoint.data[i] = struct.unpack("<f", msg[2 * i])
+                msg.dataPoint.time[i] = struct.unpack("<L", msg[2 * (i + 1)])
+        except struct.error as e:
+            rospy.logerr("invalid pulse ox data message")
+            return
+
+        self.pub.publish(msg)
+
+class UltrasonicMessageHandler:
+    def __init__(self):
+        self.pub = rospy.Publisher("serial/ultrasonicData", UltrasonicDataMessage, queue_size=1)
+
+    def __call__(self, msg):
+        msg = UltrasonicDataMessage()
+        try:
+            for i in len(50):
+                msg.dataPoint.data[i] = struct.unpack("<f", msg[2 * i])
+                msg.dataPoint.time[i] = struct.unpack("<L", msg[2 * (i + 1)])
+        except struct.error as e:
+            rospy.logerr("invalid ultrasonic data message")
+            return
+
+        self.pub.publish(msg)
+
+class ImpedanceMessageHandler:
+    def __init__(self):
+        self.pub = rospy.Publisher("serial/impedanceData", ImpedanceDataMessage, queue_size=1)
+
+    def __call__(self, msg):
+        msg = ImpedanceDataMessage()
+        try:
+            for i in len(50):
+                msg.dataPoint.data[i] = struct.unpack("<f", msg[2 * i])
+                msg.dataPoint.time[i] = struct.unpack("<L", msg[2 * (i + 1)])
+        except struct.error as e:
+            rospy.logerr("invalid impedance data message")
+            return
+
+        self.pub.publish(msg)
 
 receiveHandlers = {
     0: MotorDebugInfoHandler(),
-    1: MotorInfoHandler()
+    1: MotorInfoHandler(),
+    2: ThermistorMessageHandler(),
+    3: PulseOxMessageHandler(),
+    4: UltrasonicMessageHandler(),
+    5: ImpedanceMessageHandler(),
 }
 
 def handleRx(msgType, msg):
