@@ -72,6 +72,7 @@ generate_messages(
   DEPENDENCIES
   std_msgs
   sensor_msgs
+  grasper_msg
 )
 
 ################################################

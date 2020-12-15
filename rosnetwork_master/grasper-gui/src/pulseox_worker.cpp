@@ -5,10 +5,22 @@
 #include <QDebug>
 
 #include "main_controller.hpp"
+#include "custom_plot_item.hpp"
 
-void PulseoxWorker::msgCallback(const std_msgs::String &msg)
+void PulseoxWorker::msgCallback(const grasper_msg::PulseOxRxMessage &msg)
 {
-    Q_UNUSED(msg);
+    double avgX = 0;
+    for (int i = 0; i < 50; i++)
+    {
+        avgX += msg.dataPoint[i].data;
+    }
+    avgX /= 50.0;
+    setOxygenLevel(avgX, static_cast<double>(msg.dataPoint[49].time));
+}
+
+void PulseoxWorker::initPulseOxGraph()
+{
+    qmlRegisterType<CustomPlotItem>("CustomPlot", 1, 0, "CustomPlotItem");
 }
 
 void PulseoxWorker::addConnections(QObject *root)
@@ -18,22 +30,28 @@ void PulseoxWorker::addConnections(QObject *root)
                      Qt::DirectConnection);
     QObject::connect(this, SIGNAL(onMeasurePulseoxChanged(bool)),
                      MainController::getInstance(), SLOT(setEnablePulseOx(bool)));
+    pulseoxMsgSubscriber = MainController::getInstance()->getNodeHandle()->subscribe(
+                "serial/pulseOxData",
+                1000,
+                &PulseoxWorker::msgCallback,
+                this);
 }
 
-void PulseoxWorker::setOxygenLevel(double oxygenLevel)
+void PulseoxWorker::setOxygenLevel(double oxygenLevel, double time)
 {
-    qDebug() << "oxygen level received of: " << oxygenLevel;
     if (m_oxygenLevel != oxygenLevel)
     {
         m_oxygenLevel = oxygenLevel;
-        MainController::getInstance()->getRoot()->setProperty("oxygen", QVariant(m_oxygenLevel));
-        emit onOxygenLevelChanged(m_oxygenLevel);
+        if (m_measurePulseox)
+        {
+            MainController::getInstance()->getRoot()->setProperty("oxygen", QVariant(QString::number(m_oxygenLevel, 'g', 2)));
+            emit onOxygenLevelChanged(m_oxygenLevel, time);
+        }
     }
 }
 
 void PulseoxWorker::setMeasurePulseox(bool measurePulseox)
 {
-    qDebug() << "measure pulse ox change requested of: " << measurePulseox;
     if (m_measurePulseox != measurePulseox)
     {
         m_measurePulseox = measurePulseox;
@@ -46,6 +64,4 @@ void PulseoxWorker::run()
     ros::NodeHandle *n = MainController::getInstance()->getNodeHandle();
 
     if (n == nullptr) return;
-
-    Q_UNUSED(n);
 }

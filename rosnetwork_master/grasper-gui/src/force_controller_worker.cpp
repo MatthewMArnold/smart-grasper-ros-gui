@@ -34,8 +34,11 @@ void ForceControllerWorker::setForceActual(double force)
     if (force != m_forceActual)
     {
         m_forceActual = force;
-        MainController::getInstance()->getRoot()->setProperty("actualForce", QVariant(force));
-        emit onForceActualChanged(m_forceActual);
+        if (m_measureForceRequest)
+        {
+            MainController::getInstance()->getRoot()->setProperty("actualForce", QVariant(force));
+            emit onForceActualChanged(m_forceActual);
+        }
     }
 }
 
@@ -101,16 +104,16 @@ void ForceControllerWorker::run()
     if (n == nullptr) return;
 
     motorRequestPub = n->advertise<grasper_msg::MotorRequestMessage>("serial/motor", 1000);
-    ros::Subscriber motorMsgSubscriber = n->subscribe("serial/motorFeedback",
+    motorMsgSubscriber = n->subscribe("serial/motorFeedback",
                                                       1000,
                                                       &ForceControllerWorker::msgCallback,
                                                       this);
-    ros::Rate loopRate(10);
+//    ros::Rate loopRate(10);
 
     // TODO add constant request polling in case messages fail to send.
-    while (ros::ok())
-    {
-        ros::spinOnce();
-        loopRate.sleep();
-    }
+//    while (ros::ok())
+//    {
+//        ros::spinOnce();
+//        loopRate.sleep();
+//    }
 }

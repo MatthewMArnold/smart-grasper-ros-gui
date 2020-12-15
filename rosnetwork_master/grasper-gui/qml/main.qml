@@ -1,6 +1,7 @@
 import QtQuick 2.9
 import QtQuick.Controls 2.2
 import Ros 1.0
+import CustomPlot 1.0
 
 ApplicationWindow {
     property int screenHeight: 850
@@ -687,7 +688,7 @@ ApplicationWindow {
                     id: text15
                     x: -4
                     y: 51
-                    text: qsTr("0")
+                    text: impedance
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     font.pixelSize: 20
@@ -854,6 +855,17 @@ ApplicationWindow {
             color: "#ffffff"
             radius: 16
             border.width: 0
+
+            CustomPlotItem {
+                id: pulseoxPlot
+                timeToDisplay: 5000
+                xAxisLabel: "MCU time (ms)"
+                yAxisLabel: "Oxygen level (SpO2%)"
+                anchors.fill: parent
+                objectName: "pulsePlot"
+
+                Component.onCompleted: initCustomPlot()
+            }
         }
     }
 }

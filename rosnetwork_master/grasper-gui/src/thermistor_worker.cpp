@@ -6,9 +6,15 @@
 
 #include "main_controller.hpp"
 
-void ThermistorWorker::msgCallback(const std_msgs::String &msg)
+void ThermistorWorker::msgCallback(const grasper_msg::ThermistorMessage &msg)
 {
-    Q_UNUSED(msg);
+    double avgX = 0;
+    for (int i = 0; i < 50; i++)
+    {
+        avgX += msg.dataPoint[i].data;
+    }
+    avgX /= 50.0;
+    setTemperature(avgX, static_cast<double>(msg.dataPoint[49].time));
 }
 
 void ThermistorWorker::addConnections(QObject *root)
@@ -18,16 +24,24 @@ void ThermistorWorker::addConnections(QObject *root)
                      Qt::DirectConnection);
     QObject::connect(this, SIGNAL(onMeasureTemperatureChanged(bool)),
                      MainController::getInstance(), SLOT(setEnableTemperature(bool)));
+    thermistorMsgSubscriber = MainController::getInstance()->getNodeHandle()->subscribe(
+                "serial/thermistorData",
+                1000,
+                &ThermistorWorker::msgCallback,
+                this);
 }
 
-void ThermistorWorker::setTemperature(double temperature)
+void ThermistorWorker::setTemperature(double temperature, double time)
 {
-    qDebug() << "temperature received of: " << temperature;
+    Q_UNUSED(time);
     if (m_temperature != temperature)
     {
         m_temperature = temperature;
-        MainController::getInstance()->getRoot()->setProperty("temperature", QVariant(m_temperature));
-        emit onTemperatureChanged(m_temperature);
+        if (m_measureTemperature)
+        {
+            MainController::getInstance()->getRoot()->setProperty("temperature", QVariant(QString::number(m_temperature, 'g', 2)));
+            emit onTemperatureChanged(m_temperature);
+        }
     }
 }
 
@@ -41,11 +55,4 @@ void ThermistorWorker::setMeasureTemperature(bool measureTemperature)
     }
 }
 
-void ThermistorWorker::run()
-{
-    ros::NodeHandle *n = MainController::getInstance()->getNodeHandle();
-
-    if (n == nullptr) return;
-
-    Q_UNUSED(n);
-}
+void ThermistorWorker::run() {}

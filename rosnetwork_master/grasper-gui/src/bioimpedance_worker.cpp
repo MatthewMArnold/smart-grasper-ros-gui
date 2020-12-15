@@ -1,10 +1,18 @@
 #include "bioimpedance_worker.hpp"
 
+#include <QDebug>
+
 #include "main_controller.hpp"
 
-void BioimpedanceWorker::msgCallback(const grasper_msg::MotorMessageFeedback &msg)
+void BioimpedanceWorker::msgCallback(const grasper_msg::ImpedanceDataMessage &msg)
 {
-    Q_UNUSED(msg);
+    double avgX = 0;
+    for (int i = 0; i < 50; i++)
+    {
+        avgX += msg.dataPoint[i].data;
+    }
+    avgX /= 50.0;
+    setImpedance(avgX, static_cast<double>(msg.dataPoint[49].time));
 }
 
 void BioimpedanceWorker::addConnections(QObject *root)
@@ -14,15 +22,25 @@ void BioimpedanceWorker::addConnections(QObject *root)
                      Qt::DirectConnection);
     QObject::connect(this, SIGNAL(onImpedanceRequestedChanged(bool)),
                      MainController::getInstance(), SLOT(setEnableImpedance(bool)));
+    impedanceMsgSubscriber = MainController::getInstance()->getNodeHandle()->subscribe(
+                "serial/impedanceData",
+                1000,
+                &BioimpedanceWorker::msgCallback,
+                this);
 }
 
-void BioimpedanceWorker::setImpedance(double impedance)
+void BioimpedanceWorker::setImpedance(double impedance, double time)
 {
+    Q_UNUSED(time);
     if (m_impedance != impedance)
     {
         m_impedance = impedance;
-        MainController::getInstance()->getRoot()->setProperty("impedance", QVariant(impedance));
-        emit onImpedanceChanged(impedance);
+        if (m_impedanceRequested)
+        {
+            qDebug() << impedance;
+            MainController::getInstance()->getRoot()->setProperty("impedance", QVariant(QString::number(impedance, 'g', 2)));
+            emit onImpedanceChanged(impedance);
+        }
     }
 }
 

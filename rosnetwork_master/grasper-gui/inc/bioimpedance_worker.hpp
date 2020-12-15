@@ -8,7 +8,7 @@
 #include <QMutex>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
-#include <grasper_msg/MotorMessageFeedback.h>
+#include <grasper_msg/ImpedanceDataMessage.h>
 
 /**
  * Class that handles enabling and disabling the motor controller and
@@ -20,22 +20,21 @@ class BioimpedanceWorker : public QThread
     Q_OBJECT
     Q_PROPERTY(double impedance
                READ impedance
-               NOTIFY onImpedanceChanged
-               WRITE setImpedance);
+               NOTIFY onImpedanceChanged)
     Q_PROPERTY(bool impedanceRequested
                READ impedanceRequested
                NOTIFY onImpedanceRequestedChanged
-               WRITE setImpedanceRequested);
+               WRITE setImpedanceRequested)
 
 public:
-    void msgCallback(const grasper_msg::MotorMessageFeedback &msg);
+    void msgCallback(const grasper_msg::ImpedanceDataMessage &msg);
     void addConnections(QObject *root);
 
     double impedance() const { return m_impedance; }
     bool impedanceRequested() const { return m_impedanceRequested; }
 
 public slots:
-    void setImpedance(double impedance);
+    void setImpedance(double impedance, double time);
     void setImpedanceRequested(bool impedanceRequested);
 
 signals:
@@ -45,6 +44,7 @@ signals:
 private:
     double m_impedance;
     bool m_impedanceRequested;
+    ros::Subscriber impedanceMsgSubscriber;
 
     void run() override;
 };

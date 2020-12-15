@@ -21,19 +21,19 @@ class ForceControllerWorker : public QThread
     Q_PROPERTY(double forceDesired
                READ forceDesired
                NOTIFY onForceDesiredChanged
-               WRITE setForceDesired);
+               WRITE setForceDesired)
     Q_PROPERTY(double forceActual
                READ forceActual
                NOTIFY onForceActualChanged
-               WRITE setForceActual);
+               WRITE setForceActual)
     Q_PROPERTY(bool squeeze
                READ squeeze
                NOTIFY onSqueezeChanged
-               WRITE setSqueeze);
+               WRITE setSqueeze)
     Q_PROPERTY(bool measureForceRequest
                READ measureForceRequest
                NOTIFY onMeasureForceRequestChanged
-               WRITE setMeasureForceRequest);
+               WRITE setMeasureForceRequest)
 
 public:
     void msgCallback(const grasper_msg::MotorMessageFeedback &msg);
@@ -63,6 +63,7 @@ private:
     bool m_measureForceRequest = false;
     ros::Publisher motorRequestPub;
     QMutex requestMutex;
+    ros::Subscriber motorMsgSubscriber;
 
     void run() override;
 

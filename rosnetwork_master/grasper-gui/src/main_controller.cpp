@@ -9,6 +9,8 @@
 #include "ultrasonic_worker.hpp"
 #include "bioimpedance_worker.hpp"
 
+
+#include "custom_plot_item.hpp"
 void SensorRequestWorker::run()
 {
     ros::NodeHandle *n = MainController::getInstance()->getNodeHandle();
@@ -80,6 +82,8 @@ void MainController::initialize(QQmlApplicationEngine *engine)
     sensorRequest = new SensorRequestWorker();
 
     engine->rootContext()->setContextProperty("forceController", forceController);
+
+    pulseox->initPulseOxGraph();
 }
 
 void MainController::addConnections(QObject *root)
@@ -116,6 +120,18 @@ void MainController::addConnections(QObject *root)
     connect(&sendSensorRequestThread, &QThread::finished, sensorRequest, &QObject::deleteLater);
     sensorRequest->moveToThread(&sendSensorRequestThread);
     sensorRequest->start();
+
+    auto pulsePlot = this->getRoot()->findChild<CustomPlotItem *>("pulsePlot");
+    if (pulsePlot == nullptr)
+    {
+        qDebug() << "graphing will not work, failed to find a pulsePlot";
+    }
+    else
+    {
+        QObject::connect(pulseox, SIGNAL(onOxygenLevelChanged(double, double)),
+                         pulsePlot, SLOT(graphData(double, double)),
+                         Qt::DirectConnection);
+    }
 }
 
 void MainController::setEnablePulseOx(bool enabled)

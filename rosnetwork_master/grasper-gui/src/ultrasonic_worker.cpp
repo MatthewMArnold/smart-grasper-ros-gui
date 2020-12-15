@@ -4,9 +4,15 @@
 
 #include "main_controller.hpp"
 
-void UltrasonicWorker::msgCallback(const std_msgs::String &msg)
+void UltrasonicWorker::msgCallback(const grasper_msg::UltrasonicDataMessage &msg)
 {
-    Q_UNUSED(msg);
+    double avgX = 0;
+    for (int i = 0; i < 50; i++)
+    {
+        avgX += msg.dataPoint[i].data;
+    }
+    avgX /= 50.0;
+    setVelocityOfSound(avgX, static_cast<double>(msg.dataPoint[49].time));
 }
 
 void UltrasonicWorker::addConnections(QObject *root)
@@ -16,16 +22,24 @@ void UltrasonicWorker::addConnections(QObject *root)
                      Qt::DirectConnection);
     QObject::connect(this, SIGNAL(onMeasureVelocityOfSoundChanged(bool)),
                      MainController::getInstance(), SLOT(setEnableVelocityOfSound(bool)));
+    ultrassonicMsgSubscriber = MainController::getInstance()->getNodeHandle()->subscribe(
+                "serial/ultrasonicData",
+                1000,
+                &UltrasonicWorker::msgCallback,
+                this);
 }
 
-void UltrasonicWorker::setVelocityOfSound(double velocityOfSound)
+void UltrasonicWorker::setVelocityOfSound(double velocityOfSound, double time)
 {
-    qDebug() << "velocity of sound set to: " << velocityOfSound;
+    Q_UNUSED(time);
     if (m_velocityOfSound != velocityOfSound)
     {
         m_velocityOfSound = velocityOfSound;
-        MainController::getInstance()->getRoot()->setProperty("velocityOfSound", QVariant(velocityOfSound));
-        emit onVelocityOfSoundChanged(m_velocityOfSound);
+        if (m_measureVelocityOfSound)
+        {
+            MainController::getInstance()->getRoot()->setProperty("velocityOfSound", QVariant(QString::number(m_velocityOfSound, 'g', 2)));
+            emit onVelocityOfSoundChanged(m_velocityOfSound);
+        }
     }
 }
 
@@ -39,11 +53,4 @@ void UltrasonicWorker::setMeasureVelocityOfSound(bool measureVelocityOfSound)
     }
 }
 
-void UltrasonicWorker::run()
-{
-    ros::NodeHandle *n = MainController::getInstance()->getNodeHandle();
-
-    if (n == nullptr) return;
-
-    Q_UNUSED(n);
-}
+void UltrasonicWorker::run() {}

@@ -8,28 +8,28 @@
 #include <QString>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <grasper_msg/ThermistorMessage.h>
 
 class ThermistorWorker : public QThread
 {
     Q_OBJECT
     Q_PROPERTY(double temperature
                READ temperature
-               NOTIFY onTemperatureChanged
-               WRITE setTemperature);
+               NOTIFY onTemperatureChanged)
     Q_PROPERTY(bool measureTemperature
                READ measureTemperature
                NOTIFY onMeasureTemperatureChanged
-               WRITE setMeasureTemperature);
+               WRITE setMeasureTemperature)
 
 public:
-    void msgCallback(const std_msgs::String &msg);
+    void msgCallback(const grasper_msg::ThermistorMessage &msg);
     void addConnections(QObject *root);
 
     double temperature() const { return m_temperature; }
     bool measureTemperature() const { return m_measureTemperature; }
 
 public slots:
-    void setTemperature(double temperature);
+    void setTemperature(double temperature, double time);
     void setMeasureTemperature(bool measureTemperature);
 
 signals:
@@ -39,6 +39,7 @@ signals:
 private:
     double m_temperature;
     bool m_measureTemperature;
+    ros::Subscriber thermistorMsgSubscriber;
 
     void run() override;
 };

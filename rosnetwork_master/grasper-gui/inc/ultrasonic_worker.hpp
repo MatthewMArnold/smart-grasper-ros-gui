@@ -8,28 +8,28 @@
 #include <QString>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <grasper_msg/UltrasonicDataMessage.h>
 
 class UltrasonicWorker : public QThread
 {
     Q_OBJECT
     Q_PROPERTY(double velocityOfSound
                READ velocityOfSound
-               NOTIFY onVelocityOfSoundChanged
-               WRITE setVelocityOfSound);
+               NOTIFY onVelocityOfSoundChanged)
     Q_PROPERTY(bool measureVelocityOfSound
                READ measureVelocityOfSound
                NOTIFY onMeasureVelocityOfSoundChanged
-               WRITE setMeasureVelocityOfSound);
+               WRITE setMeasureVelocityOfSound)
 
 public:
-    void msgCallback(const std_msgs::String &msg);
+    void msgCallback(const grasper_msg::UltrasonicDataMessage &msg);
     void addConnections(QObject *root);
 
     double velocityOfSound() const { return m_velocityOfSound; }
     bool measureVelocityOfSound() const { return m_measureVelocityOfSound; }
 
 public slots:
-    void setVelocityOfSound(double velocityOfSound);
+    void setVelocityOfSound(double velocityOfSound, double time);
     void setMeasureVelocityOfSound(bool measureVelocityOfSound);
 
 signals:
@@ -39,6 +39,7 @@ signals:
 private:
     double m_velocityOfSound;
     bool m_measureVelocityOfSound;
+    ros::Subscriber ultrassonicMsgSubscriber;
 
     void run() override;
 };

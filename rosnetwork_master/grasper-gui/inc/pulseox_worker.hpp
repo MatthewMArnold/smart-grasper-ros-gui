@@ -8,37 +8,42 @@
 #include <QString>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <grasper_msg/PulseOxRxMessage.h>
+#include <QVector>
 
 class PulseoxWorker : public QThread
 {
     Q_OBJECT
     Q_PROPERTY(double oxygenLevel
-               READ oxygenLevel
-               NOTIFY onOxygenLevelChanged
-               WRITE setOxygenLevel);
+               READ oxygenLevel)
     Q_PROPERTY(bool measurePulseox
                READ measurePulseox
                NOTIFY onMeasurePulseoxChanged
-               WRITE setMeasurePulseox);
+               WRITE setMeasurePulseox)
 
 public:
-    void msgCallback(const std_msgs::String &msg);
+    void msgCallback(const grasper_msg::PulseOxRxMessage &msg);
+    void initPulseOxGraph();
     void addConnections(QObject *root);
 
     double oxygenLevel() const { return m_oxygenLevel; }
     bool measurePulseox() const { return m_measurePulseox; }
 
 public slots:
-    void setOxygenLevel(double oxygenLevel);
+    void setOxygenLevel(double oxygenLevel, double time);
     void setMeasurePulseox(bool measurePulseox);
 
 signals:
-    void onOxygenLevelChanged(double oxygenLevel);
+    void onOxygenLevelChanged(double oxygenLevel, double time);
     void onMeasurePulseoxChanged(bool measurePulseox);
 
 private:
     double m_oxygenLevel;
     bool m_measurePulseox;
+    ros::Subscriber pulseoxMsgSubscriber;
+
+    QVector<double> m_pulseoxX;
+    QVector<double> m_pulseoxY;
 
     void run() override;
 };
