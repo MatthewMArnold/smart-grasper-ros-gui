@@ -14,7 +14,7 @@ PKGCONFIG += \
     visualization_msgs \
     grasper_msg
 
-QT += gui qml widgets charts core printsupport quick
+QT += gui qml widgets core printsupport quick
 
 SOURCES += \
     src/main.cpp \
@@ -25,7 +25,8 @@ SOURCES += \
     src/ultrasonic_worker.cpp \
     src/bioimpedance_worker.cpp \
     src/qcustomplot.cpp \
-    src/custom_plot_item.cpp
+    src/custom_plot_item.cpp \
+    src/error_controller.cpp
 
 INCLUDEPATH += inc
 
@@ -37,7 +38,8 @@ HEADERS += \
     inc/ultrasonic_worker.hpp \
     inc/bioimpedance_worker.hpp \
     inc/qcustomplot.h \
-    inc/custom_plot_item.hpp
+    inc/custom_plot_item.hpp \
+    inc/error_controller.hpp
 
 RESOURCES += \
     resources.qrc

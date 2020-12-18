@@ -35,12 +35,132 @@ ApplicationWindow {
     signal onVelocityOfSoundRequestChanged(bool velocityOfSoundRequested)
     signal onImpedanceRequestChanged(bool impedanceRequested)
 
+    function triggerCriticalErrorDialogue(msg) {
+        criticalErrorIndicator.visible = true
+        criticalErrorMessage.text = msg
+        runAllSensorsButton.enabled = false
+        runSensorsText.opacity = 0.5
+    }
+
+    function hideCriticalErrorDialogue() {
+        criticalErrorIndicator.visible = false
+        runAllSensorsButton.enabled = true
+        runSensorsText.opacity = 1.0
+        cancelErrorButton.visible = false
+    }
+
+    signal criticalErrorOKPressed()
+    signal criticalErrorCancelPressed()
+
+    function triggerNonurgentErrorDialogue(msg) {
+        noncriticalErrorIndicator.visible = true
+        noncriticalErrorText.text = msg
+    }
+
+    function hideNonurgentErrorDialogue() {
+        noncriticalErrorIndicator.visible = false
+    }
+
     Rectangle {
         id: mainScreen
         width: parent.width
         height: parent.height
 
         color: "#1c163c"
+
+        function disableAll() {
+            runAllSensorsButton.enabled = false
+        }
+
+        Rectangle {
+            id: noncriticalErrorIndicator
+
+            z: 999
+            visible: true
+            anchors.top: parent.top
+            anchors.topMargin: 0
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.leftMargin: 0
+            anchors.rightMargin: 0
+            height: 60
+            color: "yellow"
+
+            Text {
+                id: noncriticalErrorText
+                horizontalAlignment: Text.AlignHCenter
+                // Hide, this is just an example
+                text: "Noisy connection between the MCU and Raspberry Pi. Messages are being dropped.<br>Please double check wired connection."
+                anchors.centerIn: parent
+                font.pointSize: 14
+            }
+        }
+
+        Rectangle {
+            id: criticalErrorIndicator
+
+            z: 1000
+            visible: true
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.topMargin: 100
+            height: 200
+            border.color: "red"
+            border.width: 20
+
+            onVisibleChanged: {
+                if (visible) {
+                    console.log("onVisibleChanged")
+                    mainScreen.disableAll()
+                }
+            }
+
+            Text {
+                id: criticalErrorMessage
+                anchors.left: parent.left
+                anchors.leftMargin: 40
+                anchors.verticalCenter: parent.verticalCenter
+                // This is an example message
+                text: "The MCU is not properly connected to the<br>Raspberry Pi.<br>Please check the connection and hit OK."
+                font.pixelSize: 36
+            }
+
+            Button {
+                id: dismissErrorButton
+                anchors.right: parent.right
+                anchors.rightMargin: 50
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.topMargin: 25
+                width: parent.width / 5
+                height: (parent.height) / 2
+                onReleased: criticalErrorOKPressed()
+                Text {
+                    id: dismissErrorButtonText
+                    text: "OK"
+                    anchors.centerIn: parent
+                    font.pixelSize: 48
+                }
+            }
+
+//            Button {
+//                id: cancelErrorButton
+//                visible: false
+//                anchors.right: parent.right
+//                anchors.rightMargin: 25
+//                anchors.top: dismissErrorButton.bottom
+//                anchors.topMargin: 25
+//                width: parent.width / 5
+//                height: (parent.height - 75) / 2
+//                onReleased: criticalErrorCancelPressed()
+//                Text {
+//                    id: cancelErrorButtonText
+//                    text: "CANCEL"
+//                    anchors.centerIn: parent
+//                    font.pixelSize: 48
+//                }
+//            }
+        }
 
         RoundButton {
             id: runAllSensorsButton
@@ -669,8 +789,8 @@ ApplicationWindow {
             Text {
                 id: impedanceText
                 color: "#ffffff"
+                horizontalAlignment: Text.AlignHCenter
                 text: qsTr("Impedance,\nmagnitude/frequency")
-                horizontalAlignment: Text.AlignCenter
                 font.weight: Font.Bold
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: 20
