@@ -22,6 +22,8 @@ This directory contains code for running on a Raspberry Pi as a ROS master.
   ```
 - Install [this](https://github.com/severin-lemaignan/ros-qml-plugin) software
   to allow you to run ROS in a qt project.
+- Install opencv libraries. Follow [this](https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html) guide.
+  Make sure to `sudo make install` after following the instructions.
 
 To build the workspace:
 - In this directory, run `catkin_make`.
