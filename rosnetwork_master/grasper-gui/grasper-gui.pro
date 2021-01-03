@@ -12,7 +12,8 @@ PKGCONFIG += \
     tf \
     image_transport \
     visualization_msgs \
-    grasper_msg
+    grasper_msg \
+    cv_bridge
 
 QT += gui qml widgets core printsupport quick
 
@@ -26,9 +27,12 @@ SOURCES += \
     src/bioimpedance_worker.cpp \
     src/qcustomplot.cpp \
     src/custom_plot_item.cpp \
-    src/error_controller.cpp
+    src/error_controller.cpp \
+    src/image_displayer.cpp
 
-INCLUDEPATH += inc
+INCLUDEPATH += \
+    inc \
+    /usr/local/include
 
 HEADERS += \
     inc/main_controller.hpp \
@@ -39,7 +43,25 @@ HEADERS += \
     inc/bioimpedance_worker.hpp \
     inc/qcustomplot.h \
     inc/custom_plot_item.hpp \
-    inc/error_controller.hpp
+    inc/error_controller.hpp \
+    inc/image_displayer.hpp
 
 RESOURCES += \
     resources.qrc
+
+LIBS += \
+     -lopencv_core \
+     -lopencv_highgui \
+     -lopencv_imgproc \
+     -lopencv_features2d \
+     -lopencv_flann \
+     -lopencv_ml \
+     -lopencv_objdetect \
+     -lopencv_photo \
+     -lopencv_stitching \
+     -lopencv_superres \
+     -lopencv_ts \
+     -lopencv_video \
+     -lopencv_videostab \
+     -lopencv_calib3d \
+     -lopencv_imgcodecs

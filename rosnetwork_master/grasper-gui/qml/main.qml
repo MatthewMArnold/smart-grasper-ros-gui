@@ -2,6 +2,7 @@ import QtQuick 2.9
 import QtQuick.Controls 2.2
 import Ros 1.0
 import CustomPlot 1.0
+import ImageDisplayer 1.0
 
 ApplicationWindow {
     property int screenHeight: 850
@@ -76,7 +77,7 @@ ApplicationWindow {
             id: noncriticalErrorIndicator
 
             z: 999
-            visible: true
+            visible: false
             anchors.top: parent.top
             anchors.topMargin: 0
             anchors.left: parent.left
@@ -100,7 +101,7 @@ ApplicationWindow {
             id: criticalErrorIndicator
 
             z: 1000
-            visible: true
+            visible: false
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
@@ -938,6 +939,14 @@ ApplicationWindow {
             radius: 16
             anchors.rightMargin: 63
             border.width: 0
+
+            ImageDisplayer {
+                id: cameraDisplay
+                objectName: "cameraDisplay"
+                anchors.fill: parent
+
+                Component.onCompleted: initImageDisplayer()
+            }
         }
 
         Rectangle {
