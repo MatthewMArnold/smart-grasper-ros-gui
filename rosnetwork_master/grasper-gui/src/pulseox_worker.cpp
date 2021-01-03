@@ -18,10 +18,7 @@ void PulseoxWorker::msgCallback(const grasper_msg::PulseOxRxMessage &msg)
     setOxygenLevel(avgX, static_cast<double>(msg.dataPoint[49].time));
 }
 
-void PulseoxWorker::initPulseOxGraph()
-{
-    qmlRegisterType<CustomPlotItem>("CustomPlot", 1, 0, "CustomPlotItem");
-}
+void PulseoxWorker::initPulseOxGraph() {}
 
 void PulseoxWorker::addConnections(QObject *root)
 {
