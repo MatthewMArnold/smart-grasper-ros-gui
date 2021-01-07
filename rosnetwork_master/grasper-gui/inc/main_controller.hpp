@@ -7,6 +7,10 @@
 #include <QMutex>
 #include <ros/ros.h>
 #include <grasper_msg/SensorRequestMessage.h>
+#include <std_msgs/Bool.h>
+#include <QTimer>
+
+#include "error_reporter.hpp"
 
 class ForceControllerWorker;
 class ThermistorWorker;
@@ -28,9 +32,13 @@ class SensorRequestWorker : public QThread
  * Main controller that sets up all worker threads that connect ros
  * publishers and the gui.
  */
-class MainController : public QObject
+class MainController : public QObject, public ErrorReporter
 {
     Q_OBJECT
+    Q_PROPERTY(bool teensyConnected
+               READ teensyConnected
+               NOTIFY onTeensyConnectedChanged
+               WRITE setTeensyConnected)
 
 public:
     static inline MainController *getInstance()
@@ -54,13 +62,27 @@ public:
 
     grasper_msg::SensorRequestMessage getSensorRequestMsg();
 
+    bool teensyConnected() const { return m_teensyConnected; }
+
+    void teensyConnectedMsgCallback(const std_msgs::Bool &msg);
+
+    void errorCleared(ErrorController::ErrorType type) override { Q_UNUSED(type); }
+
 public slots:
     void setEnablePulseOx(bool enabled);
     void setEnableTemperature(bool enabled);
     void setEnableVelocityOfSound(bool enabled);
     void setEnableImpedance(bool enabled);
+    void setTeensyConnected(bool teensyConnected);
+    void teensyDisconnected();
+
+signals:
+    void teensyConnectedMsgReceived();
+    void onTeensyConnectedChanged(bool teensyConnected);
 
 private:
+    static constexpr int TEENSY_TIMEOUT_MS = 1000;
+
     static MainController *mainController;
 
     // Thread workers
@@ -84,6 +106,11 @@ private:
 
     ros::NodeHandle n;
     QObject *root;
+
+    bool m_teensyConnected = false;
+    ros::Subscriber teensyConnectedSub;
+    QTimer m_teensyConnectedTimeout;
+
 
     MainController() = default;
 };

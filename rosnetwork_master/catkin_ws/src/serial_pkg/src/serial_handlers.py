@@ -1,4 +1,5 @@
 from grasper_msg.msg import *
+from std_msgs.msg import Bool
 import rospy
 import struct
 
@@ -44,64 +45,78 @@ class ThermistorMessageHandler:
         self.pub = rospy.Publisher("serial/thermistorData", ThermistorMessage, queue_size=1)
 
     def __call__(self, msg):
-        msg = ThermistorMessage()
+        structuredMsg = ThermistorMessage()
         try:
             for i in len(50):
-                msg.dataPoint.data[i] = struct.unpack("<f", msg[2 * i])
-                msg.dataPoint.time[i] = struct.unpack("<L", msg[2 * (i + 1)])
+                structuredMsg.dataPoint.data[i] = struct.unpack("<f", msg[2 * i])
+                structuredMsg.dataPoint.time[i] = struct.unpack("<L", msg[2 * (i + 1)])
         except struct.error as e:
             rospy.logerr("invalid thermistor data message")
             return
 
-        self.pub.publish(msg)
+        self.pub.publish(structuredMsg)
 
 class PulseOxMessageHandler:
     def __init__(self):
         self.pub = rospy.Publisher("serial/pulseOxData", PulseOxRxMessage, queue_size=1)
 
     def __call__(self, msg):
-        msg = PulseOxRxMessage()
+        structuredMsg = PulseOxRxMessage()
         try:
             for i in len(50):
-                msg.dataPoint.data[i] = struct.unpack("<f", msg[2 * i])
-                msg.dataPoint.time[i] = struct.unpack("<L", msg[2 * (i + 1)])
+                structuredMsg.dataPoint.data[i] = struct.unpack("<f", msg[2 * i])
+                structuredMsg.dataPoint.time[i] = struct.unpack("<L", msg[2 * (i + 1)])
         except struct.error as e:
             rospy.logerr("invalid pulse ox data message")
             return
 
-        self.pub.publish(msg)
+        self.pub.publish(structuredMsg)
 
 class UltrasonicMessageHandler:
     def __init__(self):
         self.pub = rospy.Publisher("serial/ultrasonicData", UltrasonicDataMessage, queue_size=1)
 
     def __call__(self, msg):
-        msg = UltrasonicDataMessage()
+        structuredMsg = UltrasonicDataMessage()
         try:
             for i in len(50):
-                msg.dataPoint.data[i] = struct.unpack("<f", msg[2 * i])
-                msg.dataPoint.time[i] = struct.unpack("<L", msg[2 * (i + 1)])
+                structuredMsg.dataPoint.data[i] = struct.unpack("<f", msg[2 * i])
+                structuredMsg.dataPoint.time[i] = struct.unpack("<L", msg[2 * (i + 1)])
         except struct.error as e:
             rospy.logerr("invalid ultrasonic data message")
             return
 
-        self.pub.publish(msg)
+        self.pub.publish(structuredMsg)
 
 class ImpedanceMessageHandler:
     def __init__(self):
         self.pub = rospy.Publisher("serial/impedanceData", ImpedanceDataMessage, queue_size=1)
 
     def __call__(self, msg):
-        msg = ImpedanceDataMessage()
+        structuredMsg = ImpedanceDataMessage()
         try:
             for i in len(50):
-                msg.dataPoint.data[i] = struct.unpack("<f", msg[2 * i])
-                msg.dataPoint.time[i] = struct.unpack("<L", msg[2 * (i + 1)])
+                structuredMsg.dataPoint.data[i] = struct.unpack("<f", msg[2 * i])
+                structuredMsg.dataPoint.time[i] = struct.unpack("<L", msg[2 * (i + 1)])
         except struct.error as e:
             rospy.logerr("invalid impedance data message")
             return
 
-        self.pub.publish(msg)
+        self.pub.publish(structuredMsg)
+
+class MCUConnectedHandler
+    def __init__(self):
+        self.pub = rospy.Publisher("serial/mcuConnected", Bool, queue_size=1)
+    
+    def __call__(self, msg):
+        structuredMsg = Bool()
+        try:
+            structuredMsg.data = struct.unpack("?", msg[0])
+        except struct.error as e:
+            rospy.logerr("invalid mcu connected message")
+            return
+
+        self.pub.publish(structuredMsg)
 
 receiveHandlers = {
     0: MotorDebugInfoHandler(),
@@ -110,6 +125,7 @@ receiveHandlers = {
     3: PulseOxMessageHandler(),
     4: UltrasonicMessageHandler(),
     5: ImpedanceMessageHandler(),
+    6: MCUConnectedHandler()
 }
 
 def handleRx(msgType, msg):

@@ -3,14 +3,14 @@
 #include <QQmlContext>
 #include <QDebug>
 
-#include "force_controller_worker.hpp"
-#include "thermistor_worker.hpp"
-#include "pulseox_worker.hpp"
-#include "ultrasonic_worker.hpp"
 #include "bioimpedance_worker.hpp"
-
-
 #include "custom_plot_item.hpp"
+#include "force_controller_worker.hpp"
+#include "pulseox_worker.hpp"
+#include "thermistor_worker.hpp"
+#include "ultrasonic_worker.hpp"
+#include "error_controller.hpp"
+
 void SensorRequestWorker::run()
 {
     ros::NodeHandle *n = MainController::getInstance()->getNodeHandle();
@@ -70,6 +70,12 @@ MainController::~MainController()
     delete sensorRequest;
 }
 
+void MainController::teensyConnectedMsgCallback(const std_msgs::Bool &msg)
+{
+    emit teensyConnectedMsgReceived();
+    if (msg.data) setTeensyConnected(true);
+}
+
 void MainController::initialize(QQmlApplicationEngine *engine)
 {
     if (engine == nullptr) return;
@@ -84,6 +90,13 @@ void MainController::initialize(QQmlApplicationEngine *engine)
     engine->rootContext()->setContextProperty("forceController", forceController);
 
     pulseox->initPulseOxGraph();
+
+    ros::NodeHandle *n = MainController::getInstance()->getNodeHandle();
+
+    teensyConnectedSub = n->subscribe("serial/mcuConnectedHandler",
+                                      1000,
+                                      &MainController::teensyConnectedMsgCallback,
+                                      this);
 }
 
 void MainController::addConnections(QObject *root)
@@ -132,6 +145,16 @@ void MainController::addConnections(QObject *root)
                          pulsePlot, SLOT(graphData(double, double)),
                          Qt::DirectConnection);
     }
+
+    QObject::connect(&m_teensyConnectedTimeout, SIGNAL(timeout()), this, SLOT(teensyDisconnected()));
+    QObject::connect(this, SIGNAL(teensyConnectedMsgReceived()), &m_teensyConnectedTimeout, SLOT(start()), Qt::QueuedConnection);
+
+    m_teensyConnectedTimeout.start(TEENSY_TIMEOUT_MS);
+}
+
+void MainController::teensyDisconnected()
+{
+    setTeensyConnected(false);
 }
 
 void MainController::setEnablePulseOx(bool enabled)
@@ -160,6 +183,27 @@ void MainController::setEnableImpedance(bool enabled)
     sensorRequestLock.lock();
     sensorRequestMessage.enableImpedance = enabled;
     sensorRequestLock.unlock();
+}
+
+void MainController::setTeensyConnected(bool teensyConnected)
+{
+    if (m_teensyConnected != teensyConnected)
+    {
+        m_teensyConnected = teensyConnected;
+
+        if (m_teensyConnected)
+        {
+            qDebug() << "teensy connected";
+            ErrorController::getInstance()->removeError(ErrorController::ErrorType::TEENSY_DISCONNECTED);
+        }
+        else
+        {
+            qDebug() << "teensy disconnected";
+            ErrorController::getInstance()->addError(this, ErrorController::ErrorType::TEENSY_DISCONNECTED);
+        }
+
+        emit onTeensyConnectedChanged(m_teensyConnected);
+    }
 }
 
 grasper_msg::SensorRequestMessage MainController::getSensorRequestMsg()

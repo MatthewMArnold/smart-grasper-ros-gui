@@ -5,14 +5,14 @@
 #include <QtQuick/QQuickPaintedItem>
 #include <queue>
 
-class ErrorCaller;
+class ErrorReporter;
 
 class ErrorController
 {
 public:
     enum class ErrorType
     {
-
+        TEENSY_DISCONNECTED = 0,
     };
 
     static ErrorController *getInstance()
@@ -26,13 +26,15 @@ public:
 
     void initialize();
 
-    void addError(ErrorCaller *callingClass, ErrorType error);
+    void addError(ErrorReporter *callingClass, ErrorType error);
+
+    void removeError(ErrorType error);
 
 private:
 
     struct ErrorMsg
     {
-        ErrorCaller *callingClass;
+        ErrorReporter *callingClass;
         ErrorType type;
     };
 
@@ -40,11 +42,6 @@ private:
 
     std::queue<ErrorMsg> criticalErrorQueue;
     std::queue<ErrorMsg> nonCriticalErrorQueue;
-};
-
-class ErrorCaller
-{
-    virtual void errorCleared(ErrorController::ErrorType type);
 };
 
 #endif  // ERROR_CONTROLLER_HPP_
