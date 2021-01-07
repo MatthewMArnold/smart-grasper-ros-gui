@@ -3,6 +3,7 @@ import rospy
 import random
 from grasper_msg.msg import *
 import math
+from std_msgs.msg import Bool
 
 def pulse_ox_talker():
     rospy.init_node('pulse_ox_talker')
@@ -11,6 +12,7 @@ def pulse_ox_talker():
     thermistor_pub = rospy.Publisher('serial/thermistorData', PulseOxRxMessage, queue_size=10)
     ultrasonic_pub = rospy.Publisher('serial/ultrasonicData', UltrasonicDataMessage, queue_size=10)
     impedance_pub = rospy.Publisher('serial/impedanceData', ImpedanceDataMessage, queue_size=10)
+    mcu_connected_pub = rospy.Publisher('serial/mcuConnectedHandler', Bool, queue_size=10)
     j = 0
     while not rospy.is_shutdown():
         pulseox_num = math.sin(j * 1)
@@ -22,6 +24,8 @@ def pulse_ox_talker():
         thermistor_msg = ThermistorMessage()
         ultrasonic_msg = UltrasonicDataMessage()
         impedance_msg = ImpedanceDataMessage()
+        mcu_msg = Bool()
+        mcu_msg.data = True
 
         for i in range(50):
             pulseox_msg.dataPoint[i].data = pulseox_num
@@ -40,6 +44,7 @@ def pulse_ox_talker():
         thermistor_pub.publish(thermistor_msg)
         ultrasonic_pub.publish(ultrasonic_msg)
         impedance_pub.publish(impedance_msg)
+        mcu_connected_pub.publish(mcu_msg)
 
         rate.sleep()
 

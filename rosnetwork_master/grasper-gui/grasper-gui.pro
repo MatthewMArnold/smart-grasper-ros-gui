@@ -44,7 +44,8 @@ HEADERS += \
     inc/qcustomplot.h \
     inc/custom_plot_item.hpp \
     inc/error_controller.hpp \
-    inc/image_displayer.hpp
+    inc/image_displayer.hpp \
+    inc/error_reporter.hpp
 
 RESOURCES += \
     resources.qrc
