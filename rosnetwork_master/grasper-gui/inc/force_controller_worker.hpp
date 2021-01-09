@@ -2,13 +2,13 @@
 #define FORCE_SENSOR_HPP_
 
 #include <QApplication>
-#include <QQmlApplicationEngine>
-#include <QThread>
-#include <QString>
 #include <QMutex>
+#include <QQmlApplicationEngine>
+#include <QString>
+#include <QThread>
+#include <grasper_msg/MotorMessageFeedback.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
-#include <grasper_msg/MotorMessageFeedback.h>
 
 /**
  * Class that handles enabling and disabling the motor controller and
@@ -18,22 +18,14 @@
 class ForceControllerWorker : public QThread
 {
     Q_OBJECT
-    Q_PROPERTY(double forceDesired
-               READ forceDesired
-               NOTIFY onForceDesiredChanged
-               WRITE setForceDesired)
-    Q_PROPERTY(double forceActual
-               READ forceActual
-               NOTIFY onForceActualChanged
-               WRITE setForceActual)
-    Q_PROPERTY(bool squeeze
-               READ squeeze
-               NOTIFY onSqueezeChanged
-               WRITE setSqueeze)
-    Q_PROPERTY(bool measureForceRequest
-               READ measureForceRequest
-               NOTIFY onMeasureForceRequestChanged
-               WRITE setMeasureForceRequest)
+    Q_PROPERTY(double forceDesired READ forceDesired NOTIFY
+                   onForceDesiredChanged WRITE setForceDesired)
+    Q_PROPERTY(double forceActual READ forceActual NOTIFY onForceActualChanged
+                   WRITE setForceActual)
+    Q_PROPERTY(
+        bool squeeze READ squeeze NOTIFY onSqueezeChanged WRITE setSqueeze)
+    Q_PROPERTY(bool measureForceRequest READ measureForceRequest NOTIFY
+                   onMeasureForceRequestChanged WRITE setMeasureForceRequest)
 
 public:
     void msgCallback(const grasper_msg::MotorMessageFeedback &msg);
@@ -67,9 +59,10 @@ private:
 
     void run() override;
 
-    void sendMotorRequest(double force,
-                          bool enableMotorController,
-                          bool measureForce);
+    void sendMotorRequest(
+        double force,
+        bool enableMotorController,
+        bool measureForce);
 };
 
 #endif  // FORCE_CONTROLLER_WORKER_HPP_

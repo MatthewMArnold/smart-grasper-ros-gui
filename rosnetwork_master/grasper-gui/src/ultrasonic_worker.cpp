@@ -4,7 +4,8 @@
 
 #include "main_controller.hpp"
 
-void UltrasonicWorker::msgCallback(const grasper_msg::UltrasonicDataMessage &msg)
+void UltrasonicWorker::msgCallback(
+    const grasper_msg::UltrasonicDataMessage &msg)
 {
     double avgX = 0;
     for (int i = 0; i < 50; i++)
@@ -17,16 +18,23 @@ void UltrasonicWorker::msgCallback(const grasper_msg::UltrasonicDataMessage &msg
 
 void UltrasonicWorker::addConnections(QObject *root)
 {
-    QObject::connect(root, SIGNAL(onVelocityOfSoundRequestChanged(bool)),
-                     this, SLOT(setMeasureVelocityOfSound(bool)),
-                     Qt::DirectConnection);
-    QObject::connect(this, SIGNAL(onMeasureVelocityOfSoundChanged(bool)),
-                     MainController::getInstance(), SLOT(setEnableVelocityOfSound(bool)));
-    ultrassonicMsgSubscriber = MainController::getInstance()->getNodeHandle()->subscribe(
-                "serial/ultrasonicData",
-                1000,
-                &UltrasonicWorker::msgCallback,
-                this);
+    QObject::connect(
+        root,
+        SIGNAL(onVelocityOfSoundRequestChanged(bool)),
+        this,
+        SLOT(setMeasureVelocityOfSound(bool)),
+        Qt::DirectConnection);
+    QObject::connect(
+        this,
+        SIGNAL(onMeasureVelocityOfSoundChanged(bool)),
+        MainController::getInstance(),
+        SLOT(setEnableVelocityOfSound(bool)));
+    ultrassonicMsgSubscriber =
+        MainController::getInstance()->getNodeHandle()->subscribe(
+            "serial/ultrasonicData",
+            1000,
+            &UltrasonicWorker::msgCallback,
+            this);
 }
 
 void UltrasonicWorker::setVelocityOfSound(double velocityOfSound, double time)
@@ -37,7 +45,9 @@ void UltrasonicWorker::setVelocityOfSound(double velocityOfSound, double time)
         m_velocityOfSound = velocityOfSound;
         if (m_measureVelocityOfSound)
         {
-            MainController::getInstance()->getRoot()->setProperty("velocityOfSound", QVariant(QString::number(m_velocityOfSound, 'g', 2)));
+            MainController::getInstance()->getRoot()->setProperty(
+                "velocityOfSound",
+                QVariant(QString::number(m_velocityOfSound, 'g', 2)));
             emit onVelocityOfSoundChanged(m_velocityOfSound);
         }
     }

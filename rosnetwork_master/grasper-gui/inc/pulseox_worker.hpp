@@ -2,24 +2,21 @@
 #define PULSEOX_WORKER_HPP
 
 #include <QApplication>
-#include <QQmlApplicationEngine>
-#include <QThread>
 #include <QObject>
+#include <QQmlApplicationEngine>
 #include <QString>
+#include <QThread>
+#include <QVector>
+#include <grasper_msg/PulseOxRxMessage.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
-#include <grasper_msg/PulseOxRxMessage.h>
-#include <QVector>
 
 class PulseoxWorker : public QThread
 {
     Q_OBJECT
-    Q_PROPERTY(double oxygenLevel
-               READ oxygenLevel)
-    Q_PROPERTY(bool measurePulseox
-               READ measurePulseox
-               NOTIFY onMeasurePulseoxChanged
-               WRITE setMeasurePulseox)
+    Q_PROPERTY(double oxygenLevel READ oxygenLevel)
+    Q_PROPERTY(bool measurePulseox READ measurePulseox NOTIFY
+                   onMeasurePulseoxChanged WRITE setMeasurePulseox)
 
 public:
     void msgCallback(const grasper_msg::PulseOxRxMessage &msg);
@@ -48,4 +45,4 @@ private:
     void run() override;
 };
 
-#endif // PULSEOX_WORKER_HPP
+#endif  // PULSEOX_WORKER_HPP

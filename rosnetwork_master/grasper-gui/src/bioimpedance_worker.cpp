@@ -4,7 +4,8 @@
 
 #include "main_controller.hpp"
 
-void BioimpedanceWorker::msgCallback(const grasper_msg::ImpedanceDataMessage &msg)
+void BioimpedanceWorker::msgCallback(
+    const grasper_msg::ImpedanceDataMessage &msg)
 {
     double avgX = 0;
     for (int i = 0; i < 50; i++)
@@ -17,16 +18,23 @@ void BioimpedanceWorker::msgCallback(const grasper_msg::ImpedanceDataMessage &ms
 
 void BioimpedanceWorker::addConnections(QObject *root)
 {
-    QObject::connect(root, SIGNAL(onImpedanceRequestChanged(bool)),
-                     this, SLOT(setImpedanceRequested(bool)),
-                     Qt::DirectConnection);
-    QObject::connect(this, SIGNAL(onImpedanceRequestedChanged(bool)),
-                     MainController::getInstance(), SLOT(setEnableImpedance(bool)));
-    impedanceMsgSubscriber = MainController::getInstance()->getNodeHandle()->subscribe(
-                "serial/impedanceData",
-                1000,
-                &BioimpedanceWorker::msgCallback,
-                this);
+    QObject::connect(
+        root,
+        SIGNAL(onImpedanceRequestChanged(bool)),
+        this,
+        SLOT(setImpedanceRequested(bool)),
+        Qt::DirectConnection);
+    QObject::connect(
+        this,
+        SIGNAL(onImpedanceRequestedChanged(bool)),
+        MainController::getInstance(),
+        SLOT(setEnableImpedance(bool)));
+    impedanceMsgSubscriber =
+        MainController::getInstance()->getNodeHandle()->subscribe(
+            "serial/impedanceData",
+            1000,
+            &BioimpedanceWorker::msgCallback,
+            this);
 }
 
 void BioimpedanceWorker::setImpedance(double impedance, double time)
@@ -38,7 +46,9 @@ void BioimpedanceWorker::setImpedance(double impedance, double time)
         if (m_impedanceRequested)
         {
             qDebug() << impedance;
-            MainController::getInstance()->getRoot()->setProperty("impedance", QVariant(QString::number(impedance, 'g', 2)));
+            MainController::getInstance()->getRoot()->setProperty(
+                "impedance",
+                QVariant(QString::number(impedance, 'g', 2)));
             emit onImpedanceChanged(impedance);
         }
     }
@@ -53,6 +63,4 @@ void BioimpedanceWorker::setImpedanceRequested(bool impedanceRequested)
     }
 }
 
-void BioimpedanceWorker::run()
-{
-}
+void BioimpedanceWorker::run() {}
