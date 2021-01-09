@@ -1,11 +1,11 @@
 #include "pulseox_worker.hpp"
 
+#include <QDebug>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
-#include <QDebug>
 
-#include "main_controller.hpp"
 #include "custom_plot_item.hpp"
+#include "main_controller.hpp"
 
 void PulseoxWorker::msgCallback(const grasper_msg::PulseOxRxMessage &msg)
 {
@@ -22,16 +22,23 @@ void PulseoxWorker::initPulseOxGraph() {}
 
 void PulseoxWorker::addConnections(QObject *root)
 {
-    QObject::connect(root, SIGNAL(onPulseOxRequestChanged(bool)),
-                     this, SLOT(setMeasurePulseox(bool)),
-                     Qt::DirectConnection);
-    QObject::connect(this, SIGNAL(onMeasurePulseoxChanged(bool)),
-                     MainController::getInstance(), SLOT(setEnablePulseOx(bool)));
-    pulseoxMsgSubscriber = MainController::getInstance()->getNodeHandle()->subscribe(
-                "serial/pulseOxData",
-                1000,
-                &PulseoxWorker::msgCallback,
-                this);
+    QObject::connect(
+        root,
+        SIGNAL(onPulseOxRequestChanged(bool)),
+        this,
+        SLOT(setMeasurePulseox(bool)),
+        Qt::DirectConnection);
+    QObject::connect(
+        this,
+        SIGNAL(onMeasurePulseoxChanged(bool)),
+        MainController::getInstance(),
+        SLOT(setEnablePulseOx(bool)));
+    pulseoxMsgSubscriber =
+        MainController::getInstance()->getNodeHandle()->subscribe(
+            "serial/pulseOxData",
+            1000,
+            &PulseoxWorker::msgCallback,
+            this);
 }
 
 void PulseoxWorker::setOxygenLevel(double oxygenLevel, double time)
@@ -41,7 +48,9 @@ void PulseoxWorker::setOxygenLevel(double oxygenLevel, double time)
         m_oxygenLevel = oxygenLevel;
         if (m_measurePulseox)
         {
-            MainController::getInstance()->getRoot()->setProperty("oxygen", QVariant(QString::number(m_oxygenLevel, 'g', 2)));
+            MainController::getInstance()->getRoot()->setProperty(
+                "oxygen",
+                QVariant(QString::number(m_oxygenLevel, 'g', 2)));
             emit onOxygenLevelChanged(m_oxygenLevel, time);
         }
     }

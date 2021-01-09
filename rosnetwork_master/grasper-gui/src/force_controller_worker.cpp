@@ -1,14 +1,16 @@
 #include "force_controller_worker.hpp"
 
-#include <QDebug>
-#include <ros/ros.h>
 #include <sstream>
-#include <std_msgs/String.h>
+
+#include <QDebug>
 #include <grasper_msg/MotorRequestMessage.h>
+#include <ros/ros.h>
+#include <std_msgs/String.h>
 
 #include "main_controller.hpp"
 
-void ForceControllerWorker::msgCallback(const grasper_msg::MotorMessageFeedback &msg)
+void ForceControllerWorker::msgCallback(
+    const grasper_msg::MotorMessageFeedback &msg)
 {
     setForceActual(msg.appliedForce);
 }
@@ -36,7 +38,9 @@ void ForceControllerWorker::setForceActual(double force)
         m_forceActual = force;
         if (m_measureForceRequest)
         {
-            MainController::getInstance()->getRoot()->setProperty("actualForce", QVariant(force));
+            MainController::getInstance()->getRoot()->setProperty(
+                "actualForce",
+                QVariant(force));
             emit onForceActualChanged(m_forceActual);
         }
     }
@@ -74,20 +78,30 @@ void ForceControllerWorker::setMeasureForceRequest(bool measureForceRequest)
 
 void ForceControllerWorker::addConnections(QObject *root)
 {
-    QObject::connect(root, SIGNAL(onDesiredForceChanged(double)),
-                     this, SLOT(setForceDesired(double)),
-                     Qt::DirectConnection);
-    QObject::connect(root, SIGNAL(onMotorClosedRequested(bool)),
-                     this, SLOT(setSqueeze(bool)),
-                     Qt::DirectConnection);
-    QObject::connect(root, SIGNAL(onForceRequestChanged(bool)),
-                     this, SLOT(setMeasureForceRequest(bool)),
-                     Qt::DirectConnection);
+    QObject::connect(
+        root,
+        SIGNAL(onDesiredForceChanged(double)),
+        this,
+        SLOT(setForceDesired(double)),
+        Qt::DirectConnection);
+    QObject::connect(
+        root,
+        SIGNAL(onMotorClosedRequested(bool)),
+        this,
+        SLOT(setSqueeze(bool)),
+        Qt::DirectConnection);
+    QObject::connect(
+        root,
+        SIGNAL(onForceRequestChanged(bool)),
+        this,
+        SLOT(setMeasureForceRequest(bool)),
+        Qt::DirectConnection);
 }
 
-void ForceControllerWorker::sendMotorRequest(double force,
-                                             bool enableMotorController,
-                                             bool measureForce)
+void ForceControllerWorker::sendMotorRequest(
+    double force,
+    bool enableMotorController,
+    bool measureForce)
 {
     grasper_msg::MotorRequestMessage request;
     request.appliedForce = force;
@@ -103,17 +117,19 @@ void ForceControllerWorker::run()
 
     if (n == nullptr) return;
 
-    motorRequestPub = n->advertise<grasper_msg::MotorRequestMessage>("serial/motor", 1000);
-    motorMsgSubscriber = n->subscribe("serial/motorFeedback",
-                                                      1000,
-                                                      &ForceControllerWorker::msgCallback,
-                                                      this);
-//    ros::Rate loopRate(10);
+    motorRequestPub =
+        n->advertise<grasper_msg::MotorRequestMessage>("serial/motor", 1000);
+    motorMsgSubscriber = n->subscribe(
+        "serial/motorFeedback",
+        1000,
+        &ForceControllerWorker::msgCallback,
+        this);
+    //    ros::Rate loopRate(10);
 
     // TODO add constant request polling in case messages fail to send.
-//    while (ros::ok())
-//    {
-//        ros::spinOnce();
-//        loopRate.sleep();
-//    }
+    //    while (ros::ok())
+    //    {
+    //        ros::spinOnce();
+    //        loopRate.sleep();
+    //    }
 }

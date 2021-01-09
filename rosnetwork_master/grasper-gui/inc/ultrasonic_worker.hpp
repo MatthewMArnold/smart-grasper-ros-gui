@@ -2,24 +2,22 @@
 #define ULTRASONIC_WORKER_HPP
 
 #include <QApplication>
-#include <QQmlApplicationEngine>
-#include <QThread>
 #include <QObject>
+#include <QQmlApplicationEngine>
 #include <QString>
+#include <QThread>
+#include <grasper_msg/UltrasonicDataMessage.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
-#include <grasper_msg/UltrasonicDataMessage.h>
 
 class UltrasonicWorker : public QThread
 {
     Q_OBJECT
-    Q_PROPERTY(double velocityOfSound
-               READ velocityOfSound
-               NOTIFY onVelocityOfSoundChanged)
-    Q_PROPERTY(bool measureVelocityOfSound
-               READ measureVelocityOfSound
-               NOTIFY onMeasureVelocityOfSoundChanged
-               WRITE setMeasureVelocityOfSound)
+    Q_PROPERTY(double velocityOfSound READ velocityOfSound NOTIFY
+                   onVelocityOfSoundChanged)
+    Q_PROPERTY(
+        bool measureVelocityOfSound READ measureVelocityOfSound NOTIFY
+            onMeasureVelocityOfSoundChanged WRITE setMeasureVelocityOfSound)
 
 public:
     void msgCallback(const grasper_msg::UltrasonicDataMessage &msg);
@@ -44,4 +42,4 @@ private:
     void run() override;
 };
 
-#endif // ULTRASONIC_WORKER_HPP
+#endif  // ULTRASONIC_WORKER_HPP

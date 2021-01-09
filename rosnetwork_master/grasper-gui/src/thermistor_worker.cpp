@@ -1,8 +1,8 @@
 #include "thermistor_worker.hpp"
 
+#include <QDebug>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
-#include <QDebug>
 
 #include "main_controller.hpp"
 
@@ -19,16 +19,23 @@ void ThermistorWorker::msgCallback(const grasper_msg::ThermistorMessage &msg)
 
 void ThermistorWorker::addConnections(QObject *root)
 {
-    QObject::connect(root, SIGNAL(onTemperatureRequestChanged(bool)),
-                     this, SLOT(setMeasureTemperature(bool)),
-                     Qt::DirectConnection);
-    QObject::connect(this, SIGNAL(onMeasureTemperatureChanged(bool)),
-                     MainController::getInstance(), SLOT(setEnableTemperature(bool)));
-    thermistorMsgSubscriber = MainController::getInstance()->getNodeHandle()->subscribe(
-                "serial/thermistorData",
-                1000,
-                &ThermistorWorker::msgCallback,
-                this);
+    QObject::connect(
+        root,
+        SIGNAL(onTemperatureRequestChanged(bool)),
+        this,
+        SLOT(setMeasureTemperature(bool)),
+        Qt::DirectConnection);
+    QObject::connect(
+        this,
+        SIGNAL(onMeasureTemperatureChanged(bool)),
+        MainController::getInstance(),
+        SLOT(setEnableTemperature(bool)));
+    thermistorMsgSubscriber =
+        MainController::getInstance()->getNodeHandle()->subscribe(
+            "serial/thermistorData",
+            1000,
+            &ThermistorWorker::msgCallback,
+            this);
 }
 
 void ThermistorWorker::setTemperature(double temperature, double time)
@@ -39,7 +46,9 @@ void ThermistorWorker::setTemperature(double temperature, double time)
         m_temperature = temperature;
         if (m_measureTemperature)
         {
-            MainController::getInstance()->getRoot()->setProperty("temperature", QVariant(QString::number(m_temperature, 'g', 2)));
+            MainController::getInstance()->getRoot()->setProperty(
+                "temperature",
+                QVariant(QString::number(m_temperature, 'g', 2)));
             emit onTemperatureChanged(m_temperature);
         }
     }
@@ -47,7 +56,8 @@ void ThermistorWorker::setTemperature(double temperature, double time)
 
 void ThermistorWorker::setMeasureTemperature(bool measureTemperature)
 {
-    qDebug() << "measure temperature change requested of: " << measureTemperature;
+    qDebug() << "measure temperature change requested of: "
+             << measureTemperature;
     if (m_measureTemperature != measureTemperature)
     {
         m_measureTemperature = measureTemperature;

@@ -2,13 +2,13 @@
 #define BIOIMPEDANCE_WORKER_HPP
 
 #include <QApplication>
-#include <QQmlApplicationEngine>
-#include <QThread>
-#include <QString>
 #include <QMutex>
+#include <QQmlApplicationEngine>
+#include <QString>
+#include <QThread>
+#include <grasper_msg/ImpedanceDataMessage.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
-#include <grasper_msg/ImpedanceDataMessage.h>
 
 /**
  * Class that handles enabling and disabling the motor controller and
@@ -18,13 +18,9 @@
 class BioimpedanceWorker : public QThread
 {
     Q_OBJECT
-    Q_PROPERTY(double impedance
-               READ impedance
-               NOTIFY onImpedanceChanged)
-    Q_PROPERTY(bool impedanceRequested
-               READ impedanceRequested
-               NOTIFY onImpedanceRequestedChanged
-               WRITE setImpedanceRequested)
+    Q_PROPERTY(double impedance READ impedance NOTIFY onImpedanceChanged)
+    Q_PROPERTY(bool impedanceRequested READ impedanceRequested NOTIFY
+                   onImpedanceRequestedChanged WRITE setImpedanceRequested)
 
 public:
     void msgCallback(const grasper_msg::ImpedanceDataMessage &msg);
@@ -49,4 +45,4 @@ private:
     void run() override;
 };
 
-#endif // BIOIMPEDANCE_WORKER_HPP
+#endif  // BIOIMPEDANCE_WORKER_HPP

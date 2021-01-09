@@ -45,7 +45,7 @@ protected:
     void setupPulseoxData(QCustomPlot* customPlot);
 
 private:
-    QCustomPlot *m_CustomPlot;
+    QCustomPlot* m_CustomPlot;
 
     double m_prevTime;
     int m_timeToDisplay;
@@ -58,4 +58,4 @@ private slots:
     void updateCustomPlotSize();
 };
 
-#endif // CUSTOMPLOTITEM_HPP
+#endif  // CUSTOMPLOTITEM_HPP

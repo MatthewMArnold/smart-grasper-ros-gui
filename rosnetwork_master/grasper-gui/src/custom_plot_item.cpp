@@ -1,11 +1,11 @@
 #include "custom_plot_item.hpp"
 
 #include <QDebug>
-#include <QtQuick/QQuickPaintedItem>
 #include <QtQuick/QQuickItem>
+#include <QtQuick/QQuickPaintedItem>
 
-#include "qcustomplot.h"
 #include "pulseox_worker.hpp"
+#include "qcustomplot.h"
 
 CustomPlotItem::CustomPlotItem(QQuickItem* parent)
     : QQuickPaintedItem(parent),
@@ -16,8 +16,16 @@ CustomPlotItem::CustomPlotItem(QQuickItem* parent)
     // setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::AllButtons);
 
-    connect(this, &QQuickPaintedItem::widthChanged, this, &CustomPlotItem::updateCustomPlotSize);
-    connect(this, &QQuickPaintedItem::heightChanged, this, &CustomPlotItem::updateCustomPlotSize);
+    connect(
+        this,
+        &QQuickPaintedItem::widthChanged,
+        this,
+        &CustomPlotItem::updateCustomPlotSize);
+    connect(
+        this,
+        &QQuickPaintedItem::heightChanged,
+        this,
+        &CustomPlotItem::updateCustomPlotSize);
 }
 
 CustomPlotItem::~CustomPlotItem()
@@ -34,20 +42,23 @@ void CustomPlotItem::initCustomPlot()
 
     setupPulseoxData(m_CustomPlot);
 
-    connect(m_CustomPlot, &QCustomPlot::afterReplot, this, &CustomPlotItem::onCustomReplot);
+    connect(
+        m_CustomPlot,
+        &QCustomPlot::afterReplot,
+        this,
+        &CustomPlotItem::onCustomReplot);
 
     m_CustomPlot->replot();
 }
-
 
 void CustomPlotItem::paint(QPainter* painter)
 {
     if (m_CustomPlot)
     {
-        QPixmap    picture( boundingRect().size().toSize() );
-        QCPPainter qcpPainter( &picture );
+        QPixmap picture(boundingRect().size().toSize());
+        QCPPainter qcpPainter(&picture);
 
-        //m_CustomPlot->replot();
+        // m_CustomPlot->replot();
         m_CustomPlot->toPainter(&qcpPainter);
 
         painter->drawPixmap(QPoint(), picture);
@@ -56,12 +67,12 @@ void CustomPlotItem::paint(QPainter* painter)
 
 void CustomPlotItem::mousePressEvent(QMouseEvent* event)
 {
-    routeMouseEvents( event );
+    routeMouseEvents(event);
 }
 
 void CustomPlotItem::mouseReleaseEvent(QMouseEvent* event)
 {
-    routeMouseEvents( event );
+    routeMouseEvents(event);
 }
 
 void CustomPlotItem::mouseMoveEvent(QMouseEvent* event)
@@ -76,18 +87,20 @@ void CustomPlotItem::mouseDoubleClickEvent(QMouseEvent* event)
 
 void CustomPlotItem::graphClicked(QCPAbstractPlottable* plottable)
 {
-    qDebug() << Q_FUNC_INFO << QString("Clicked on graph '%1 ").arg(plottable->name());
+    qDebug() << Q_FUNC_INFO
+             << QString("Clicked on graph '%1 ").arg(plottable->name());
 }
 
 void CustomPlotItem::routeMouseEvents(QMouseEvent* event)
 {
     if (m_CustomPlot)
     {
-        QMouseEvent* newEvent = new QMouseEvent(event->type(),
-                                                event->localPos(),
-                                                event->button(),
-                                                event->buttons(),
-                                                event->modifiers());
+        QMouseEvent* newEvent = new QMouseEvent(
+            event->type(),
+            event->localPos(),
+            event->button(),
+            event->buttons(),
+            event->modifiers());
         QCoreApplication::postEvent(m_CustomPlot, newEvent);
     }
 }
@@ -100,12 +113,10 @@ void CustomPlotItem::updateCustomPlotSize()
     }
 }
 
-void CustomPlotItem::onCustomReplot()
-{
-    update();
-}
+void CustomPlotItem::onCustomReplot() { update(); }
 
-void CustomPlotItem::setupPulseoxData(QCustomPlot* customPlot)//, PulseoxWorker *pulseox)
+void CustomPlotItem::setupPulseoxData(
+    QCustomPlot* customPlot)  //, PulseoxWorker *pulseox)
 {
     customPlot->addGraph();
     customPlot->xAxis->setLabel(m_xAxisLabel);
@@ -116,7 +127,7 @@ void CustomPlotItem::setupPulseoxData(QCustomPlot* customPlot)//, PulseoxWorker 
 
 void CustomPlotItem::graphData(double data, double time)
 {
-    if(time - m_prevTime > 2)
+    if (time - m_prevTime > 2)
     {
         m_CustomPlot->graph(0)->addData(time, data);
         m_prevTime = time;

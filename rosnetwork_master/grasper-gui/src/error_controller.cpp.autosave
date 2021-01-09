@@ -1,10 +1,14 @@
 #include "error_controller.hpp"
-
 #include "error_reporter.hpp"
 
 ErrorController *ErrorController::instance = nullptr;
 
-void ErrorController::initialize() {}
+void ErrorController::initialize()
+{
+    // Populate error type -> critical error message priority and
+    // error type -> non critical error message priority
+    
+}
 
 void ErrorController::addError(ErrorReporter *callingClass, ErrorType error)
 {
@@ -12,4 +16,7 @@ void ErrorController::addError(ErrorReporter *callingClass, ErrorType error)
     Q_UNUSED(error);
 }
 
-void ErrorController::removeError(ErrorType error) { Q_UNUSED(error); }
+void ErrorController::removeError(ErrorType error)
+{
+    Q_UNUSED(error);
+}

@@ -2,13 +2,13 @@
 #define MAIN_CONTROLLER_HPP_
 
 #include <QApplication>
+#include <QMutex>
 #include <QQmlApplicationEngine>
 #include <QThread>
-#include <QMutex>
-#include <ros/ros.h>
-#include <grasper_msg/SensorRequestMessage.h>
-#include <std_msgs/Bool.h>
 #include <QTimer>
+#include <grasper_msg/SensorRequestMessage.h>
+#include <ros/ros.h>
+#include <std_msgs/Bool.h>
 
 #include "error_reporter.hpp"
 
@@ -35,15 +35,14 @@ class SensorRequestWorker : public QThread
 class MainController : public QObject, public ErrorReporter
 {
     Q_OBJECT
-    Q_PROPERTY(bool teensyConnected
-               READ teensyConnected
-               NOTIFY onTeensyConnectedChanged
-               WRITE setTeensyConnected)
+    Q_PROPERTY(bool teensyConnected READ teensyConnected NOTIFY
+                   onTeensyConnectedChanged WRITE setTeensyConnected)
 
 public:
     static inline MainController *getInstance()
     {
-        if (mainController == nullptr) {
+        if (mainController == nullptr)
+        {
             mainController = new MainController();
         }
         return mainController;
@@ -66,7 +65,10 @@ public:
 
     void teensyConnectedMsgCallback(const std_msgs::Bool &msg);
 
-    void errorCleared(ErrorController::ErrorType type) override { Q_UNUSED(type); }
+    void errorCleared(ErrorController::ErrorType type) override
+    {
+        Q_UNUSED(type);
+    }
 
 public slots:
     void setEnablePulseOx(bool enabled);
@@ -110,7 +112,6 @@ private:
     bool m_teensyConnected = false;
     ros::Subscriber teensyConnectedSub;
     QTimer m_teensyConnectedTimeout;
-
 
     MainController() = default;
 };

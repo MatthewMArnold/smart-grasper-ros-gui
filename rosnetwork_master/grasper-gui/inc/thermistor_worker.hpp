@@ -2,24 +2,20 @@
 #define THERMISTOR_WORKER_HPP
 
 #include <QApplication>
-#include <QQmlApplicationEngine>
-#include <QThread>
 #include <QObject>
+#include <QQmlApplicationEngine>
 #include <QString>
+#include <QThread>
+#include <grasper_msg/ThermistorMessage.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
-#include <grasper_msg/ThermistorMessage.h>
 
 class ThermistorWorker : public QThread
 {
     Q_OBJECT
-    Q_PROPERTY(double temperature
-               READ temperature
-               NOTIFY onTemperatureChanged)
-    Q_PROPERTY(bool measureTemperature
-               READ measureTemperature
-               NOTIFY onMeasureTemperatureChanged
-               WRITE setMeasureTemperature)
+    Q_PROPERTY(double temperature READ temperature NOTIFY onTemperatureChanged)
+    Q_PROPERTY(bool measureTemperature READ measureTemperature NOTIFY
+                   onMeasureTemperatureChanged WRITE setMeasureTemperature)
 
 public:
     void msgCallback(const grasper_msg::ThermistorMessage &msg);
@@ -44,4 +40,4 @@ private:
     void run() override;
 };
 
-#endif // THERMISTOR_WORKER_HPP
+#endif  // THERMISTOR_WORKER_HPP

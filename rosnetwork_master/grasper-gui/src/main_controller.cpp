@@ -1,15 +1,15 @@
 #include "main_controller.hpp"
 
-#include <QQmlContext>
 #include <QDebug>
+#include <QQmlContext>
 
 #include "bioimpedance_worker.hpp"
 #include "custom_plot_item.hpp"
+#include "error_controller.hpp"
 #include "force_controller_worker.hpp"
 #include "pulseox_worker.hpp"
 #include "thermistor_worker.hpp"
 #include "ultrasonic_worker.hpp"
-#include "error_controller.hpp"
 
 void SensorRequestWorker::run()
 {
@@ -17,20 +17,23 @@ void SensorRequestWorker::run()
 
     if (n == nullptr) return;
 
-    ros::Publisher pub = n->advertise<grasper_msg::SensorRequestMessage>("serial/sensorEnable", 1000);
+    ros::Publisher pub = n->advertise<grasper_msg::SensorRequestMessage>(
+        "serial/sensorEnable",
+        1000);
 
     ros::Rate loopRate(10);
 
     grasper_msg::SensorRequestMessage oldMsg;
-    grasper_msg::SensorRequestMessage newMsg = MainController::getInstance()->getSensorRequestMsg();
+    grasper_msg::SensorRequestMessage newMsg =
+        MainController::getInstance()->getSensorRequestMsg();
     pub.publish(newMsg);
     while (ros::ok())
     {
         newMsg = MainController::getInstance()->getSensorRequestMsg();
         if (newMsg.enablePulseOx != oldMsg.enablePulseOx ||
-                newMsg.enableTemperature != oldMsg.enableTemperature ||
-                newMsg.enableVelocityOfSound != oldMsg.enableVelocityOfSound ||
-                newMsg.enableImpedance != oldMsg.enableImpedance)
+            newMsg.enableTemperature != oldMsg.enableTemperature ||
+            newMsg.enableVelocityOfSound != oldMsg.enableVelocityOfSound ||
+            newMsg.enableImpedance != oldMsg.enableImpedance)
         {
             pub.publish(newMsg);
         }
@@ -87,16 +90,19 @@ void MainController::initialize(QQmlApplicationEngine *engine)
     bioimpedance = new BioimpedanceWorker();
     sensorRequest = new SensorRequestWorker();
 
-    engine->rootContext()->setContextProperty("forceController", forceController);
+    engine->rootContext()->setContextProperty(
+        "forceController",
+        forceController);
 
     pulseox->initPulseOxGraph();
 
     ros::NodeHandle *n = MainController::getInstance()->getNodeHandle();
 
-    teensyConnectedSub = n->subscribe("serial/mcuConnectedHandler",
-                                      1000,
-                                      &MainController::teensyConnectedMsgCallback,
-                                      this);
+    teensyConnectedSub = n->subscribe(
+        "serial/mcuConnectedHandler",
+        1000,
+        &MainController::teensyConnectedMsgCallback,
+        this);
 }
 
 void MainController::addConnections(QObject *root)
@@ -110,11 +116,19 @@ void MainController::addConnections(QObject *root)
     pulseox->addConnections(root);
     bioimpedance->addConnections(root);
 
-    connect(&forceControllerThread, &QThread::finished, forceController, &QObject::deleteLater);
+    connect(
+        &forceControllerThread,
+        &QThread::finished,
+        forceController,
+        &QObject::deleteLater);
     forceController->moveToThread(&forceControllerThread);
     forceController->start();
 
-    connect(&thermistorThread, &QThread::finished, thermistor, &QObject::deleteLater);
+    connect(
+        &thermistorThread,
+        &QThread::finished,
+        thermistor,
+        &QObject::deleteLater);
     thermistor->moveToThread(&thermistorThread);
     thermistor->start();
 
@@ -122,15 +136,27 @@ void MainController::addConnections(QObject *root)
     pulseox->moveToThread(&pulseoxThread);
     pulseox->start();
 
-    connect(&ultrasonicThread, &QThread::finished, ultrasonic, &QObject::deleteLater);
+    connect(
+        &ultrasonicThread,
+        &QThread::finished,
+        ultrasonic,
+        &QObject::deleteLater);
     ultrasonic->moveToThread(&ultrasonicThread);
     ultrasonic->start();
 
-    connect(&bioimpedanceThread, &QThread::finished, bioimpedance, &QObject::deleteLater);
+    connect(
+        &bioimpedanceThread,
+        &QThread::finished,
+        bioimpedance,
+        &QObject::deleteLater);
     bioimpedance->moveToThread(&bioimpedanceThread);
     bioimpedance->start();
 
-    connect(&sendSensorRequestThread, &QThread::finished, sensorRequest, &QObject::deleteLater);
+    connect(
+        &sendSensorRequestThread,
+        &QThread::finished,
+        sensorRequest,
+        &QObject::deleteLater);
     sensorRequest->moveToThread(&sendSensorRequestThread);
     sensorRequest->start();
 
@@ -141,21 +167,30 @@ void MainController::addConnections(QObject *root)
     }
     else
     {
-        QObject::connect(pulseox, SIGNAL(onOxygenLevelChanged(double, double)),
-                         pulsePlot, SLOT(graphData(double, double)),
-                         Qt::DirectConnection);
+        QObject::connect(
+            pulseox,
+            SIGNAL(onOxygenLevelChanged(double, double)),
+            pulsePlot,
+            SLOT(graphData(double, double)),
+            Qt::DirectConnection);
     }
 
-    QObject::connect(&m_teensyConnectedTimeout, SIGNAL(timeout()), this, SLOT(teensyDisconnected()));
-    QObject::connect(this, SIGNAL(teensyConnectedMsgReceived()), &m_teensyConnectedTimeout, SLOT(start()), Qt::QueuedConnection);
+    QObject::connect(
+        &m_teensyConnectedTimeout,
+        SIGNAL(timeout()),
+        this,
+        SLOT(teensyDisconnected()));
+    QObject::connect(
+        this,
+        SIGNAL(teensyConnectedMsgReceived()),
+        &m_teensyConnectedTimeout,
+        SLOT(start()),
+        Qt::QueuedConnection);
 
     m_teensyConnectedTimeout.start(TEENSY_TIMEOUT_MS);
 }
 
-void MainController::teensyDisconnected()
-{
-    setTeensyConnected(false);
-}
+void MainController::teensyDisconnected() { setTeensyConnected(false); }
 
 void MainController::setEnablePulseOx(bool enabled)
 {
@@ -194,12 +229,15 @@ void MainController::setTeensyConnected(bool teensyConnected)
         if (m_teensyConnected)
         {
             qDebug() << "teensy connected";
-            ErrorController::getInstance()->removeError(ErrorController::ErrorType::TEENSY_DISCONNECTED);
+            ErrorController::getInstance()->removeError(
+                ErrorController::ErrorType::TEENSY_DISCONNECTED);
         }
         else
         {
             qDebug() << "teensy disconnected";
-            ErrorController::getInstance()->addError(this, ErrorController::ErrorType::TEENSY_DISCONNECTED);
+            ErrorController::getInstance()->addError(
+                this,
+                ErrorController::ErrorType::TEENSY_DISCONNECTED);
         }
 
         emit onTeensyConnectedChanged(m_teensyConnected);

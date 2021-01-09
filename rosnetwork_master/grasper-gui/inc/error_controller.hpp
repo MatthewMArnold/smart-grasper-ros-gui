@@ -1,9 +1,10 @@
 #ifndef ERROR_CONTROLLER_HPP_
 #define ERROR_CONTROLLER_HPP_
 
+#include <queue>
+
 #include <QObject>
 #include <QtQuick/QQuickPaintedItem>
-#include <queue>
 
 class ErrorReporter;
 
@@ -31,7 +32,6 @@ public:
     void removeError(ErrorType error);
 
 private:
-
     struct ErrorMsg
     {
         ErrorReporter *callingClass;
@@ -40,6 +40,8 @@ private:
 
     static ErrorController *instance;
 
+    std::map<ErrorMsg, int> criticalErrorToPriorityMap;
+    std::map<ErrorMsg, int> nonCriticalErrorToPriorityMap;
     std::queue<ErrorMsg> criticalErrorQueue;
     std::queue<ErrorMsg> nonCriticalErrorQueue;
 };
