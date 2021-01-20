@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from grasper_msg.msg import MotorRequestMessage, SensorRequestMessage
+from std_msgs.msg import Bool
 import rospy
 import serial_handlers
 import serial_parser
@@ -15,12 +16,19 @@ class SerialNode:
         self.socket = serial_parser.SerialSocket(serial_handlers.handleRx)
         self.motorListener = rospy.Subscriber("serial/motor", MotorRequestMessage, self.sendMotorRequest)
         self.sensorEnableListener = rospy.Subscriber("serial/sensorEnable", SensorRequestMessage)
+        self.serialEnabledPublisher = rospy.Publisher("serial/serialNodeRunning", Bool, queue_size=1)
 
         rate = rospy.Rate(1000)
 
+        counter = 0
+
         while not rospy.is_shutdown():
+            counter += 1
+            if counter % 100 == 1:
+                msg = True
+                self.serialEnabledPublisher.publish(msg)
             self.socket.listen()
-            time.sleep(0.1)
+            rate.sleep()
 
     def sendMotorRequest(self, msg):    
         data = struct.pack("<f??", msg.angle, msg.enableMotorController, msg.measureForce)

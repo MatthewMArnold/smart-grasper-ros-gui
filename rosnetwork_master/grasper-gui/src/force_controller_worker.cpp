@@ -20,11 +20,11 @@ void ForceControllerWorker::setForceDesired(double force)
     qDebug() << "force desired set to: " << force;
     if (m_forceDesired != force)
     {
-        requestMutex.lock();
+        m_requestMutex.lock();
         m_forceDesired = force;
         bool squeeze = m_squeeze;
         bool measureForceRequest = m_measureForceRequest;
-        requestMutex.unlock();
+        m_requestMutex.unlock();
         sendMotorRequest(force, squeeze, measureForceRequest);
         emit onForceDesiredChanged(force);
     }
@@ -51,11 +51,11 @@ void ForceControllerWorker::setSqueeze(bool squeeze)
     qDebug() << "set squeezed set to: " << squeeze;
     if (m_squeeze != squeeze)
     {
-        requestMutex.lock();
+        m_requestMutex.lock();
         m_squeeze = squeeze;
         double forceDesired = m_forceDesired;
         bool measureForceRequest = m_measureForceRequest;
-        requestMutex.unlock();
+        m_requestMutex.unlock();
         sendMotorRequest(forceDesired, squeeze, measureForceRequest);
         emit onSqueezeChanged(squeeze);
     }
@@ -66,11 +66,11 @@ void ForceControllerWorker::setMeasureForceRequest(bool measureForceRequest)
     qDebug() << "force requested set to: " << measureForceRequest;
     if (m_measureForceRequest != measureForceRequest)
     {
-        requestMutex.lock();
+        m_requestMutex.lock();
         m_measureForceRequest = measureForceRequest;
         double forceDesired = m_forceDesired = m_forceDesired;
         bool squeeze = m_squeeze;
-        requestMutex.unlock();
+        m_requestMutex.unlock();
         sendMotorRequest(forceDesired, squeeze, measureForceRequest);
         emit onMeasureForceRequestChanged(measureForceRequest);
     }
@@ -108,7 +108,7 @@ void ForceControllerWorker::sendMotorRequest(
     request.enableMotorController = enableMotorController;
     request.measureForce = measureForce;
 
-    motorRequestPub.publish(request);
+    m_motorRequestPub.publish(request);
 }
 
 void ForceControllerWorker::run()
@@ -117,9 +117,9 @@ void ForceControllerWorker::run()
 
     if (n == nullptr) return;
 
-    motorRequestPub =
+    m_motorRequestPub =
         n->advertise<grasper_msg::MotorRequestMessage>("serial/motor", 1000);
-    motorMsgSubscriber = n->subscribe(
+    m_motorMsgSubscriber = n->subscribe(
         "serial/motorFeedback",
         1000,
         &ForceControllerWorker::msgCallback,

@@ -29,7 +29,7 @@ void BioimpedanceWorker::addConnections(QObject *root)
         SIGNAL(onImpedanceRequestedChanged(bool)),
         MainController::getInstance(),
         SLOT(setEnableImpedance(bool)));
-    impedanceMsgSubscriber =
+    m_impedanceMsgSubscriber =
         MainController::getInstance()->getNodeHandle()->subscribe(
             "serial/impedanceData",
             1000,

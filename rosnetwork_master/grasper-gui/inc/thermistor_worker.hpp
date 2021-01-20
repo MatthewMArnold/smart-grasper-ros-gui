@@ -35,7 +35,7 @@ signals:
 private:
     double m_temperature;
     bool m_measureTemperature;
-    ros::Subscriber thermistorMsgSubscriber;
+    ros::Subscriber m_thermistorMsgSubscriber;
 
     void run() override;
 };

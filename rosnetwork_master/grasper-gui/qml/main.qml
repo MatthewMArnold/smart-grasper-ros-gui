@@ -36,22 +36,22 @@ ApplicationWindow {
     signal onVelocityOfSoundRequestChanged(bool velocityOfSoundRequested)
     signal onImpedanceRequestChanged(bool impedanceRequested)
 
-    function triggerCriticalErrorDialogue(msg) {
+    function triggerCriticalErrorDialogue(msg, dismissable) {
+        console.log("triggerCriticalErrorDialogue")
         criticalErrorIndicator.visible = true
         criticalErrorMessage.text = msg
-        runAllSensorsButton.enabled = false
         runSensorsText.opacity = 0.5
+        dismissErrorButton.visible = dismissable
     }
 
     function hideCriticalErrorDialogue() {
+        console.log("hideCriticalErrorDialogue")
         criticalErrorIndicator.visible = false
-        runAllSensorsButton.enabled = true
+        criticalErrorMessage.text = "none"
         runSensorsText.opacity = 1.0
-        cancelErrorButton.visible = false
     }
 
     signal criticalErrorOKPressed()
-    signal criticalErrorCancelPressed()
 
     function triggerNonurgentErrorDialogue(msg) {
         noncriticalErrorIndicator.visible = true
@@ -112,7 +112,6 @@ ApplicationWindow {
 
             onVisibleChanged: {
                 if (visible) {
-                    console.log("onVisibleChanged")
                     mainScreen.disableAll()
                 }
             }
@@ -143,24 +142,6 @@ ApplicationWindow {
                     font.pixelSize: 48
                 }
             }
-
-//            Button {
-//                id: cancelErrorButton
-//                visible: false
-//                anchors.right: parent.right
-//                anchors.rightMargin: 25
-//                anchors.top: dismissErrorButton.bottom
-//                anchors.topMargin: 25
-//                width: parent.width / 5
-//                height: (parent.height - 75) / 2
-//                onReleased: criticalErrorCancelPressed()
-//                Text {
-//                    id: cancelErrorButtonText
-//                    text: "CANCEL"
-//                    anchors.centerIn: parent
-//                    font.pixelSize: 48
-//                }
-//            }
         }
 
         RoundButton {

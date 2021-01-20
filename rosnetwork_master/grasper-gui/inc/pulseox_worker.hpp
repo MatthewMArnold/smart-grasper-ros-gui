@@ -37,7 +37,7 @@ signals:
 private:
     double m_oxygenLevel;
     bool m_measurePulseox;
-    ros::Subscriber pulseoxMsgSubscriber;
+    ros::Subscriber m_pulseoxMsgSubscriber;
 
     QVector<double> m_pulseoxX;
     QVector<double> m_pulseoxY;

@@ -7,7 +7,9 @@
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 
-class ImageDisplayer : public QQuickPaintedItem
+#include "error_reporter.hpp"
+
+class ImageDisplayer : public QQuickPaintedItem, public ErrorReporter
 {
     Q_OBJECT
 
@@ -22,17 +24,28 @@ public:
 
     void handleIncomingImage(const sensor_msgs::ImageConstPtr &image);
 
+    void errorCleared(ErrorController::ErrorType type) override;
+
 public slots:
-    void displayImage();
+    void imageNodeDisconnected();
+    void setImageNodeConnected(bool connected);
+
+signals:
+    void imageNodeMsgReceived();
 
 private:
-    QTimer *timer;
-    ros::NodeHandle nodeHandle;
-    image_transport::ImageTransport imageTransport;
-    image_transport::Subscriber sub;
-    cv_bridge::CvImagePtr cvPtr;
+    static constexpr int IMAGE_DISPLAY_FREQUENCY = 100;
+    static constexpr int IMAGE_NODE_ERROR_TIMEOUT = 1000;
 
-    int displayTimeout = 100;
+    QTimer *m_imageDisplayTimer;
+
+    ros::NodeHandle m_nodeHandle;
+    image_transport::ImageTransport m_imageTransport;
+    image_transport::Subscriber m_imageTransportSub;
+    cv_bridge::CvImagePtr m_cvPtr;
+
+    bool m_imageNodeRunning = true;
+    QTimer *m_imageNodeRunningTimeout;
 };
 
 #endif  // IMAGE_DISPLAYER_HPP_

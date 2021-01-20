@@ -14,9 +14,12 @@ int main(int argc, char *argv[])
     ros::init(argc, argv, "grasper_qt_gui");
     QApplication app(argc, argv);
     QQmlApplicationEngine appEngine;
+    ErrorController::getInstance()->initialize();
     MainController::getInstance()->initialize(&appEngine);
     appEngine.load(QUrl("qrc:main.qml"));
     MainController::getInstance()->addConnections(
+        appEngine.rootObjects().first());
+    ErrorController::getInstance()->addConnections(
         appEngine.rootObjects().first());
     return app.exec();
 }

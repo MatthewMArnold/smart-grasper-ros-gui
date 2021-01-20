@@ -10955,8 +10955,8 @@ QCPAxisPainterPrivate::TickLabelData QCPAxisPainterPrivate::getTickLabelData(
 
     // determine whether beautiful decimal powers should be used
     bool useBeautifulPowers = false;
-    int ePos = -1;  // first index of exponent part, text before that will be
-                    // basePart, text until eLast will be expPart
+    int ePos = -1;   // first index of exponent part, text before that will be
+                     // basePart, text until eLast will be expPart
     int eLast = -1;  // last index of exponent part, rest of text after this
                      // will be suffixPart
     if (substituteExponent)

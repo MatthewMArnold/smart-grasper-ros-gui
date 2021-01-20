@@ -40,7 +40,7 @@ signals:
 private:
     double m_impedance;
     bool m_impedanceRequested;
-    ros::Subscriber impedanceMsgSubscriber;
+    ros::Subscriber m_impedanceMsgSubscriber;
 
     void run() override;
 };
