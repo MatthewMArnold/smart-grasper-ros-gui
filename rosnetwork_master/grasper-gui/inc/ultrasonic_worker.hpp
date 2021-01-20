@@ -37,7 +37,7 @@ signals:
 private:
     double m_velocityOfSound;
     bool m_measureVelocityOfSound;
-    ros::Subscriber ultrassonicMsgSubscriber;
+    ros::Subscriber m_ultrasonicMsgSubscriber;
 
     void run() override;
 };

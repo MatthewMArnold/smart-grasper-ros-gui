@@ -79,6 +79,12 @@ void MainController::teensyConnectedMsgCallback(const std_msgs::Bool &msg)
     if (msg.data) setTeensyConnected(true);
 }
 
+void MainController::serialNodeConnectedMsgCallback(const std_msgs::Bool &msg)
+{
+    emit serialNodeRunningMsgReceived();
+    if (msg.data) setSerialNodeRunning(true);
+}
+
 void MainController::initialize(QQmlApplicationEngine *engine)
 {
     if (engine == nullptr) return;
@@ -96,12 +102,15 @@ void MainController::initialize(QQmlApplicationEngine *engine)
 
     pulseox->initPulseOxGraph();
 
-    ros::NodeHandle *n = MainController::getInstance()->getNodeHandle();
-
-    teensyConnectedSub = n->subscribe(
+    m_teensyConnectedSub = m_nodeHandle.subscribe(
         "serial/mcuConnectedHandler",
         1000,
         &MainController::teensyConnectedMsgCallback,
+        this);
+    m_serialRunningSub = m_nodeHandle.subscribe(
+        "serial/serialNodeRunning",
+        1000,
+        &MainController::serialNodeConnectedMsgCallback,
         this);
 }
 
@@ -186,37 +195,50 @@ void MainController::addConnections(QObject *root)
         &m_teensyConnectedTimeout,
         SLOT(start()),
         Qt::QueuedConnection);
+    QObject::connect(
+        &m_serialNodeconnectedTimeout,
+        SIGNAL(timeout()),
+        this,
+        SLOT(serialNodeDisconnected()));
+    QObject::connect(
+        this,
+        SIGNAL(serialNodeRunningMsgReceived()),
+        &m_serialNodeconnectedTimeout,
+        SLOT(start()),
+        Qt::QueuedConnection);
 
     m_teensyConnectedTimeout.start(TEENSY_TIMEOUT_MS);
 }
 
 void MainController::teensyDisconnected() { setTeensyConnected(false); }
 
+void MainController::serialNodeDisconnected() { setSerialNodeRunning(false); }
+
 void MainController::setEnablePulseOx(bool enabled)
 {
     sensorRequestLock.lock();
-    sensorRequestMessage.enablePulseOx = enabled;
+    m_sensorRequestMessage.enablePulseOx = enabled;
     sensorRequestLock.unlock();
 }
 
 void MainController::setEnableTemperature(bool enabled)
 {
     sensorRequestLock.lock();
-    sensorRequestMessage.enableTemperature = enabled;
+    m_sensorRequestMessage.enableTemperature = enabled;
     sensorRequestLock.unlock();
 }
 
 void MainController::setEnableVelocityOfSound(bool enabled)
 {
     sensorRequestLock.lock();
-    sensorRequestMessage.enableVelocityOfSound = enabled;
+    m_sensorRequestMessage.enableVelocityOfSound = enabled;
     sensorRequestLock.unlock();
 }
 
 void MainController::setEnableImpedance(bool enabled)
 {
     sensorRequestLock.lock();
-    sensorRequestMessage.enableImpedance = enabled;
+    m_sensorRequestMessage.enableImpedance = enabled;
     sensorRequestLock.unlock();
 }
 
@@ -239,15 +261,35 @@ void MainController::setTeensyConnected(bool teensyConnected)
                 this,
                 ErrorController::ErrorType::TEENSY_DISCONNECTED);
         }
+    }
+}
 
-        emit onTeensyConnectedChanged(m_teensyConnected);
+void MainController::setSerialNodeRunning(bool serialNodeRunning)
+{
+    if (m_serialNodeRunning != serialNodeRunning)
+    {
+        m_serialNodeRunning = serialNodeRunning;
+
+        if (m_serialNodeRunning)
+        {
+            qDebug() << "serial node running";
+            ErrorController::getInstance()->removeError(
+                ErrorController::ErrorType::SERIAL_NODE_NOT_RUNNING);
+        }
+        else
+        {
+            qDebug() << "serial node not running";
+            ErrorController::getInstance()->addError(
+                this,
+                ErrorController::ErrorType::SERIAL_NODE_NOT_RUNNING);
+        }
     }
 }
 
 grasper_msg::SensorRequestMessage MainController::getSensorRequestMsg()
 {
     sensorRequestLock.lock();
-    grasper_msg::SensorRequestMessage msg = sensorRequestMessage;
+    grasper_msg::SensorRequestMessage msg = m_sensorRequestMessage;
     sensorRequestLock.unlock();
     return msg;
 }

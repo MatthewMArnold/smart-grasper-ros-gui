@@ -35,8 +35,8 @@ class SensorRequestWorker : public QThread
 class MainController : public QObject, public ErrorReporter
 {
     Q_OBJECT
-    Q_PROPERTY(bool teensyConnected READ teensyConnected NOTIFY
-                   onTeensyConnectedChanged WRITE setTeensyConnected)
+    Q_PROPERTY(
+        bool teensyConnected READ teensyConnected WRITE setTeensyConnected)
 
 public:
     static inline MainController *getInstance()
@@ -55,7 +55,7 @@ public:
     void initialize(QQmlApplicationEngine *engine);
     void addConnections(QObject *root);
 
-    ros::NodeHandle *getNodeHandle() { return &n; }
+    ros::NodeHandle *getNodeHandle() { return &m_nodeHandle; }
 
     QObject *getRoot() { return root; }
 
@@ -64,6 +64,8 @@ public:
     bool teensyConnected() const { return m_teensyConnected; }
 
     void teensyConnectedMsgCallback(const std_msgs::Bool &msg);
+
+    void serialNodeConnectedMsgCallback(const std_msgs::Bool &msg);
 
     void errorCleared(ErrorController::ErrorType type) override
     {
@@ -77,10 +79,12 @@ public slots:
     void setEnableImpedance(bool enabled);
     void setTeensyConnected(bool teensyConnected);
     void teensyDisconnected();
+    void setSerialNodeRunning(bool serialNodeRunning);
+    void serialNodeDisconnected();
 
 signals:
     void teensyConnectedMsgReceived();
-    void onTeensyConnectedChanged(bool teensyConnected);
+    void serialNodeRunningMsgReceived();
 
 private:
     static constexpr int TEENSY_TIMEOUT_MS = 1000;
@@ -103,15 +107,19 @@ private:
     QThread bioimpedanceThread;
     QThread sendSensorRequestThread;
 
-    grasper_msg::SensorRequestMessage sensorRequestMessage;
+    grasper_msg::SensorRequestMessage m_sensorRequestMessage;
     QMutex sensorRequestLock;
 
-    ros::NodeHandle n;
+    ros::NodeHandle m_nodeHandle;
     QObject *root;
 
     bool m_teensyConnected = false;
-    ros::Subscriber teensyConnectedSub;
+    ros::Subscriber m_teensyConnectedSub;
     QTimer m_teensyConnectedTimeout;
+
+    bool m_serialNodeRunning = false;
+    ros::Subscriber m_serialRunningSub;
+    QTimer m_serialNodeconnectedTimeout;
 
     MainController() = default;
 };

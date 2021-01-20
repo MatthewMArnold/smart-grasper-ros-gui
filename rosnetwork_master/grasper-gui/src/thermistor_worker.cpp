@@ -30,7 +30,7 @@ void ThermistorWorker::addConnections(QObject *root)
         SIGNAL(onMeasureTemperatureChanged(bool)),
         MainController::getInstance(),
         SLOT(setEnableTemperature(bool)));
-    thermistorMsgSubscriber =
+    m_thermistorMsgSubscriber =
         MainController::getInstance()->getNodeHandle()->subscribe(
             "serial/thermistorData",
             1000,

@@ -33,7 +33,7 @@ void PulseoxWorker::addConnections(QObject *root)
         SIGNAL(onMeasurePulseoxChanged(bool)),
         MainController::getInstance(),
         SLOT(setEnablePulseOx(bool)));
-    pulseoxMsgSubscriber =
+    m_pulseoxMsgSubscriber =
         MainController::getInstance()->getNodeHandle()->subscribe(
             "serial/pulseOxData",
             1000,

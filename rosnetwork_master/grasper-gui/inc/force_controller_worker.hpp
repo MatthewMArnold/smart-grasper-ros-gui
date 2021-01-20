@@ -53,9 +53,9 @@ private:
     double m_forceActual = 10.0f;
     bool m_squeeze = false;
     bool m_measureForceRequest = false;
-    ros::Publisher motorRequestPub;
-    QMutex requestMutex;
-    ros::Subscriber motorMsgSubscriber;
+    ros::Publisher m_motorRequestPub;
+    QMutex m_requestMutex;
+    ros::Subscriber m_motorMsgSubscriber;
 
     void run() override;
 

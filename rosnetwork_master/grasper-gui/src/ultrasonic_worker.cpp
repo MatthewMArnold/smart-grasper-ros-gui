@@ -29,7 +29,7 @@ void UltrasonicWorker::addConnections(QObject *root)
         SIGNAL(onMeasureVelocityOfSoundChanged(bool)),
         MainController::getInstance(),
         SLOT(setEnableVelocityOfSound(bool)));
-    ultrassonicMsgSubscriber =
+    m_ultrasonicMsgSubscriber =
         MainController::getInstance()->getNodeHandle()->subscribe(
             "serial/ultrasonicData",
             1000,
