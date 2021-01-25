@@ -14,7 +14,7 @@
 class PulseoxWorker : public QThread
 {
     Q_OBJECT
-    Q_PROPERTY(double oxygenLevel READ oxygenLevel)
+    Q_PROPERTY(double oxygenLevel READ oxygenLevel NOTIFY oxygenLevelChanged)
     Q_PROPERTY(bool measurePulseox READ measurePulseox NOTIFY
                    onMeasurePulseoxChanged WRITE setMeasurePulseox)
 
@@ -31,7 +31,8 @@ public slots:
     void setMeasurePulseox(bool measurePulseox);
 
 signals:
-    void onOxygenLevelChanged(double oxygenLevel, double time);
+    void oxygenLevelChanged(QString oxygenLevel);
+    void oxygenLevelChangedWithTime(double oxygenLevel, double time);
     void onMeasurePulseoxChanged(bool measurePulseox);
 
 private:

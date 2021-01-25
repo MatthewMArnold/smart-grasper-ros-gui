@@ -1,12 +1,18 @@
 import QtQuick 2.9
 import QtQuick.Controls 2.2
+import ValueUpdater 1.0
 import "qrc:/qml"
 
 Column {
     property alias sensor_heading: header.text
     property alias sensor_reading: displayBorder.display_text
+//    property string sensor_reading: ""
 
     // Add slot to update sensor value
+    function sensorReadingUpdated(sensorReading) {
+        console.log("hi" + sensorReading)
+//        sensorReading.value = sensorReading
+    }
 
     spacing: Constants.component_margin
 
@@ -21,20 +27,20 @@ Column {
 
     Rectangle {
         id: displayBorder
+        objectName: "displayBorder"
         height: Constants.default_small_text_rect_height
         color: Constants.light_purple
         radius: Constants.default_small_edge_radius
         anchors.horizontalCenter: parent.horizontalCenter
-        width: sensorReadingBoxWidth
-        property alias display_text: sensorReading.text
+        width: Constants.measurement_reading_box_width
+        property alias display_text: sensorReading.value
 
-        Text {
+        ValueUpdater {
             id: sensorReading
-            text: actualForce
-            horizontalAlignment: Text.AlignHCenter
+            objectName:"sensorReading"
+            height: parent.height
+            width: parent.width
             anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-            font.pixelSize: Constants.small_text_size
         }
     }
 }

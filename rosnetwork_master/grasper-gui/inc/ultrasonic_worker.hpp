@@ -13,11 +13,6 @@
 class UltrasonicWorker : public QThread
 {
     Q_OBJECT
-    Q_PROPERTY(double velocityOfSound READ velocityOfSound NOTIFY
-                   onVelocityOfSoundChanged)
-    Q_PROPERTY(
-        bool measureVelocityOfSound READ measureVelocityOfSound NOTIFY
-            onMeasureVelocityOfSoundChanged WRITE setMeasureVelocityOfSound)
 
 public:
     void msgCallback(const grasper_msg::UltrasonicDataMessage &msg);
@@ -31,7 +26,7 @@ public slots:
     void setMeasureVelocityOfSound(bool measureVelocityOfSound);
 
 signals:
-    void onVelocityOfSoundChanged(double velocityOfSound);
+    void onVelocityOfSoundChanged(QString velocityOfSound);
     void onMeasureVelocityOfSoundChanged(bool measureVelocityOfSound);
 
 private:

@@ -1,11 +1,12 @@
 #include "pulseox_worker.hpp"
 
 #include <QDebug>
-#include <ros/ros.h>
+#include <QQmlProperty>
 #include <std_msgs/String.h>
 
 #include "custom_plot_item.hpp"
 #include "main_controller.hpp"
+#include "value_updater.hpp"
 
 void PulseoxWorker::msgCallback(const grasper_msg::PulseOxRxMessage &msg)
 {
@@ -22,6 +23,29 @@ void PulseoxWorker::initPulseOxGraph() {}
 
 void PulseoxWorker::addConnections(QObject *root)
 {
+    ValueUpdater *pulseoxMeasurement = qobject_cast<ValueUpdater *>(
+        MainController::getInstance()
+            ->getRoot()
+            ->findChild<QObject *>("homeScreen")
+            ->findChild<QObject *>("sensorReadingsRightCol")
+            ->findChild<QObject *>("oxygen")
+            ->findChild<QObject *>("displayBorder")
+            ->findChild<QObject *>("sensorReading"));
+
+    if (pulseoxMeasurement)
+    {
+        QObject::connect(
+            this,
+            SIGNAL(oxygenLevelChanged(QString)),
+            pulseoxMeasurement,
+            SLOT(setValue(QString)),
+            Qt::QueuedConnection);
+    }
+    else
+    {
+        qDebug() << "failed to find pulse measurement value to update";
+    }
+
     QObject::connect(
         root,
         SIGNAL(onPulseOxRequestChanged(bool)),
@@ -48,10 +72,8 @@ void PulseoxWorker::setOxygenLevel(double oxygenLevel, double time)
         m_oxygenLevel = oxygenLevel;
         if (m_measurePulseox)
         {
-            MainController::getInstance()->getRoot()->setProperty(
-                "oxygen",
-                QVariant(QString::number(m_oxygenLevel, 'g', 2)));
-            emit onOxygenLevelChanged(m_oxygenLevel, time);
+            emit oxygenLevelChangedWithTime(m_oxygenLevel, time);
+            emit oxygenLevelChanged(QString::number(m_oxygenLevel, 'g', 2));
         }
     }
 }

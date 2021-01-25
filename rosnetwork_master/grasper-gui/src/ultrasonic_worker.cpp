@@ -3,6 +3,7 @@
 #include <QDebug>
 
 #include "main_controller.hpp"
+#include "value_updater.hpp"
 
 void UltrasonicWorker::msgCallback(
     const grasper_msg::UltrasonicDataMessage &msg)
@@ -18,6 +19,29 @@ void UltrasonicWorker::msgCallback(
 
 void UltrasonicWorker::addConnections(QObject *root)
 {
+    ValueUpdater *ultrasonicMeasurement = qobject_cast<ValueUpdater *>(
+        MainController::getInstance()
+            ->getRoot()
+            ->findChild<QObject *>("homeScreen")
+            ->findChild<QObject *>("sensorReadingsLeftCol")
+            ->findChild<QObject *>("velOfSound")
+            ->findChild<QObject *>("displayBorder")
+            ->findChild<QObject *>("sensorReading"));
+
+    if (ultrasonicMeasurement)
+    {
+        QObject::connect(
+            this,
+            SIGNAL(onVelocityOfSoundChanged(QString)),
+            ultrasonicMeasurement,
+            SLOT(setValue(QString)),
+            Qt::QueuedConnection);
+    }
+    else
+    {
+        qDebug() << "failed to find vel of sound value to update";
+    }
+
     QObject::connect(
         root,
         SIGNAL(onVelocityOfSoundRequestChanged(bool)),
@@ -45,10 +69,8 @@ void UltrasonicWorker::setVelocityOfSound(double velocityOfSound, double time)
         m_velocityOfSound = velocityOfSound;
         if (m_measureVelocityOfSound)
         {
-            MainController::getInstance()->getRoot()->setProperty(
-                "velocityOfSound",
-                QVariant(QString::number(m_velocityOfSound, 'g', 2)));
-            emit onVelocityOfSoundChanged(m_velocityOfSound);
+            emit onVelocityOfSoundChanged(
+                QString::number(m_velocityOfSound, 'g', 2));
         }
     }
 }

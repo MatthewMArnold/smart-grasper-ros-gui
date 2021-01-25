@@ -3,6 +3,7 @@
 #include <QDebug>
 
 #include "main_controller.hpp"
+#include "value_updater.hpp"
 
 void BioimpedanceWorker::msgCallback(
     const grasper_msg::ImpedanceDataMessage &msg)
@@ -18,6 +19,29 @@ void BioimpedanceWorker::msgCallback(
 
 void BioimpedanceWorker::addConnections(QObject *root)
 {
+    ValueUpdater *impedanceMeasurement = qobject_cast<ValueUpdater *>(
+        MainController::getInstance()
+            ->getRoot()
+            ->findChild<QObject *>("homeScreen")
+            ->findChild<QObject *>("sensorReadingsLeftCol")
+            ->findChild<QObject *>("impedance")
+            ->findChild<QObject *>("displayBorder")
+            ->findChild<QObject *>("sensorReading"));
+    if (impedanceMeasurement)
+    {
+        QObject::connect(
+            this,
+            SIGNAL(impedanceChanged(QString)),
+            impedanceMeasurement,
+            SLOT(setValue(QString)),
+            Qt::QueuedConnection);
+    }
+    else
+    {
+        qDebug()
+            << "impedance measurement not found, can't be displayed properly";
+    }
+
     QObject::connect(
         root,
         SIGNAL(onImpedanceRequestChanged(bool)),
@@ -45,11 +69,8 @@ void BioimpedanceWorker::setImpedance(double impedance, double time)
         m_impedance = impedance;
         if (m_impedanceRequested)
         {
-            qDebug() << impedance;
-            MainController::getInstance()->getRoot()->setProperty(
-                "impedance",
-                QVariant(QString::number(impedance, 'g', 2)));
-            emit onImpedanceChanged(impedance);
+            //            qDebug() << impedance;
+            emit impedanceChanged(QString::number(m_impedance, 'g', 2));
         }
     }
 }

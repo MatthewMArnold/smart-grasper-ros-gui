@@ -28,7 +28,8 @@ SOURCES += \
     src/qcustomplot.cpp \
     src/custom_plot_item.cpp \
     src/error_controller.cpp \
-    src/image_displayer.cpp
+    src/image_displayer.cpp \
+    src/value_updater.cpp
 
 INCLUDEPATH += \
     inc \
@@ -45,7 +46,8 @@ HEADERS += \
     inc/custom_plot_item.hpp \
     inc/error_controller.hpp \
     inc/image_displayer.hpp \
-    inc/error_reporter.hpp
+    inc/error_reporter.hpp \
+    inc/value_updater.hpp
 
 RESOURCES += \
     resources.qrc
