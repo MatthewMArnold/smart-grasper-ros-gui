@@ -88,6 +88,7 @@ signals:
 
 private:
     static constexpr int TEENSY_TIMEOUT_MS = 1000;
+    static constexpr int SEIRAL_CONNECTED_TIMEOUT_MS = 1000;
 
     static MainController *mainController;
 
@@ -113,11 +114,11 @@ private:
     ros::NodeHandle m_nodeHandle;
     QObject *root;
 
-    bool m_teensyConnected = false;
+    bool m_teensyConnected = true;
     ros::Subscriber m_teensyConnectedSub;
     QTimer m_teensyConnectedTimeout;
 
-    bool m_serialNodeRunning = false;
+    bool m_serialNodeRunning = true;
     ros::Subscriber m_serialRunningSub;
     QTimer m_serialNodeconnectedTimeout;
 

@@ -199,7 +199,8 @@ void MainController::addConnections(QObject *root)
         &m_serialNodeconnectedTimeout,
         SIGNAL(timeout()),
         this,
-        SLOT(serialNodeDisconnected()));
+        SLOT(serialNodeDisconnected()),
+        Qt::DirectConnection);
     QObject::connect(
         this,
         SIGNAL(serialNodeRunningMsgReceived()),
@@ -208,6 +209,7 @@ void MainController::addConnections(QObject *root)
         Qt::QueuedConnection);
 
     m_teensyConnectedTimeout.start(TEENSY_TIMEOUT_MS);
+    m_serialNodeconnectedTimeout.start(SEIRAL_CONNECTED_TIMEOUT_MS);
 }
 
 void MainController::teensyDisconnected() { setTeensyConnected(false); }
