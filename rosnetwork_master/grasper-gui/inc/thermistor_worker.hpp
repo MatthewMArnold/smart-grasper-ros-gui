@@ -13,9 +13,6 @@
 class ThermistorWorker : public QThread
 {
     Q_OBJECT
-    Q_PROPERTY(double temperature READ temperature NOTIFY onTemperatureChanged)
-    Q_PROPERTY(bool measureTemperature READ measureTemperature NOTIFY
-                   onMeasureTemperatureChanged WRITE setMeasureTemperature)
 
 public:
     void msgCallback(const grasper_msg::ThermistorMessage &msg);
@@ -29,7 +26,7 @@ public slots:
     void setMeasureTemperature(bool measureTemperature);
 
 signals:
-    void onTemperatureChanged(double temperature);
+    void temperatureChanged(QString temperature);
     void onMeasureTemperatureChanged(bool measureTemperature);
 
 private:

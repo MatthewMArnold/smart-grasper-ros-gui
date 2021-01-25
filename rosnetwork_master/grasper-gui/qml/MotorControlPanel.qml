@@ -7,6 +7,38 @@ Column {
 
     width: Constants.default_panel_width
 
+    signal motorControllerTurnedOn
+    signal motorControllerTurnedOff
+
+    function turnOnMotorController() {
+        releaseButton.enabled = true
+        closeButton.enabled = false
+        desiredForceSlider.enabled = true
+        desiredForceText.opacity = 1
+        desiredForceSpecified.opacity = 1
+        motorControllerTurnedOn()
+    }
+
+    function turnOffMotorController() {
+        releaseButton.enabled = false
+        closeButton.enabled = true
+        desiredForceSlider.enabled = false
+        desiredForceSlider.reset()
+        desiredForceText.opacity = Constants.default_disabled_opacity
+        desiredForceSpecified.opacity = Constants.default_disabled_opacity
+        motorControllerTurnedOff()
+    }
+
+    function disableMotorControlButtons() {
+        releaseButton.enabled = false
+        closeButton.enabled = false
+    }
+
+    function enableMotorControlButtons() {
+        releaseButton.enabled = true
+        closeButton.enabled = true
+    }
+
     Rectangle {
         id: motorControlPanelHeader
         width: parent.width
@@ -35,38 +67,38 @@ Column {
         readonly property int default_motor_button_width: 80
         readonly property int default_motor_button_height: 40
 
-        function onMotorControlEnabled() {
-            console.log("motor control enabled")
-            closeButton.enabled = false
-            releaseButton.enabled = true
-            desiredForceSlider.enabled = true
-            desiredForceText.opacity = 1
-            desiredForceSpecified.opacity = 1
-            forceSwitch.enabled = 0
-            if (forceSwitch.position === 0) {
-                forceSwitch.toggle()
-            }
-            onForceRequestChanged(true)
-            onMotorClosedRequested(true)
-        }
+//        function onMotorControlEnabled() {
+//            console.log("motor control enabled")
+//            closeButton.enabled = false
+//            releaseButton.enabled = true
+//            desiredForceSlider.enabled = true
+//            desiredForceText.opacity = 1
+//            desiredForceSpecified.opacity = 1
+//            forceSwitch.enabled = 0
+//            if (forceSwitch.position === 0) {
+//                forceSwitch.toggle()
+//            }
+//            onForceRequestChanged(true)
+//            onMotorClosedRequested(true)
+//        }
 
-        function onMotorControlDisabled() {
-            console.log("motor control disabled")
-            closeButton.enabled = true
-            releaseButton.enabled = false
-            desiredForceSlider.enabled = false
-            desiredForceText.opacity = 0.25
-            desiredForceSpecified.opacity = 0.25
-            desiredForceSlider.value = 0
-            onDesiredForceChanged(0)
-            desiredForceSpecified.text = forceController.forceDesired
-            forceSwitch.enabled = 1
-            if (forceSwitch.position === 1) {
-                forceSwitch.toggle()
-            }
-            onForceRequestChanged(false)
-            onMotorClosedRequested(false)
-        }
+//        function onMotorControlDisabled() {
+//            console.log("motor control disabled")
+//            closeButton.enabled = true
+//            releaseButton.enabled = false
+//            desiredForceSlider.enabled = false
+//            desiredForceText.opacity = 0.25
+//            desiredForceSpecified.opacity = 0.25
+//            desiredForceSlider.value = 0
+//            onDesiredForceChanged(0)
+//            desiredForceSpecified.text = forceController.forceDesired
+//            forceSwitch.enabled = 1
+//            if (forceSwitch.position === 1) {
+//                forceSwitch.toggle()
+//            }
+//            onForceRequestChanged(false)
+//            onMotorClosedRequested(false)
+//        }
 
         RoundButton {
             id: releaseButton
@@ -77,6 +109,8 @@ Column {
             width: motorControlPanel.default_motor_button_width
             height: motorControlPanel.default_motor_button_height
             enabled: false
+
+            onClicked: turnOffMotorController()
 
             Text {
                 text: "Release"
@@ -93,15 +127,6 @@ Column {
                 color: Constants.dark_red
                 radius: releaseButton.radius
             }
-
-            // TODO fix
-            onClicked: {
-                if (runAllSensorsButton.isToggled) {
-                    // All sensors are disabled when motor control is turned off
-                    runAllSensorsButton.onAllSensorsReleased()
-                }
-                motorControlPanel.onMotorControlDisabled()
-            }
         }
 
         RoundButton {
@@ -113,7 +138,7 @@ Column {
             width: motorControlPanel.default_motor_button_width
             height: motorControlPanel.default_motor_button_height
 
-            onClicked: motorControlPanel.onMotorControlEnabled()
+            onClicked: turnOnMotorController()
 
             background: Rectangle {
                 id: closeButtonBackground
@@ -152,7 +177,15 @@ Column {
             value: 0
             enabled: false
 
-            property double maxDesiredForce: 10.0
+            readonly property double maxDesiredForce: 10.0
+
+            function reset() {
+                if (value !== 0) {
+                    onDesiredForceChanged(0)
+                    value = 0
+                    desiredForceSpecified.text = "0"
+                }
+            }
 
             onMoved: {
                 onDesiredForceChanged(Math.round(value * maxDesiredForce * 100) / 100)

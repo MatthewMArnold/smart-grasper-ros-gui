@@ -7,6 +7,54 @@ import "qrc:/qml"
 Rectangle {
     color: Constants.background_color
 
+    property int curr_state: 0
+    property int prev_state: 0
+    states: [
+        State {
+            name: "no sensors running"
+            when: (curr_state === 0)
+
+            StateChangeScript {
+                name: "no sensors running"
+                script: {
+                    if (prev_state === 1) {
+                        measurementPanel.turnOffAllMeasurements()
+                        measurementPanel.enableMeasurementButtons()
+                        motorControlPanel.enableMotorControlButtons()
+                        motorControlPanel.turnOffMotorController()
+                    }
+                    prev_state = curr_state
+                }
+            }
+        },
+        State {
+            name: "run all sensors pressed"
+            when: (curr_state === 1)
+            StateChangeScript {
+                name:  "run all sensors pressed"
+                script: {
+                    measurementPanel.turnOnAllMeasurements()
+                    measurementPanel.disableMeasurementButtons()
+                    motorControlPanel.turnOnMotorController()
+                    motorControlPanel.disableMotorControlButtons()
+                    prev_state = curr_state
+                }
+            }
+        },
+        State {
+            name: "error"
+            when: (curr_state === 2)
+            StateChangeScript {
+                name: "error"
+                script: {
+                    prev_state = curr_state
+                    measurementPanel.disableMeasurementButtons()
+                    motorControlPanel.disableMotorControlButtons()
+                }
+            }
+        }
+    ]
+
     MeasurementPanel {
         id: measurementPanel
         anchors.left: parent.left
@@ -16,7 +64,15 @@ Rectangle {
     }
 
     MotorControlPanel {
-        id: motorControlPanelCol
+        id: motorControlPanel
+
+        onMotorControllerTurnedOn: {
+            measurementPanel.forceSwitchOn()
+        }
+        onMotorControllerTurnedOff: {
+            measurementPanel.forceSwitchOff()
+        }
+
         anchors.left: measurementPanel.right
         anchors.leftMargin: Constants.component_margin
         anchors.bottom: parent.bottom
@@ -26,7 +82,8 @@ Rectangle {
 
     Column {
         id: sensorReadingsLeftCol
-        anchors.left: motorControlPanelCol.right
+        objectName: "sensorReadingsLeftCol"
+        anchors.left: motorControlPanel.right
         anchors.leftMargin: Constants.component_margin
         anchors.bottom: parent.bottom
         anchors.bottomMargin: Constants.screen_margin
@@ -34,21 +91,21 @@ Rectangle {
         spacing: 60
 
         SensorReading {
-            id: actualForce
+            objectName: "actualForce"
             anchors.horizontalCenter: parent.horizontalCenter
             sensor_heading: "Actual Force, N"
             sensor_reading: "0"
         }
 
         SensorReading {
-            id: velOfSound
+            objectName: "velOfSound"
             anchors.horizontalCenter: parent.horizontalCenter
             sensor_heading: "Velocity of Sound, m/sec"
             sensor_reading: "0"
         }
 
         SensorReading {
-            id: impedance
+            objectName: "impedance"
             anchors.horizontalCenter: parent.horizontalCenter
             sensor_heading: "Impedance,\nmagnitude/frequency"
             sensor_reading: "0"
@@ -57,6 +114,7 @@ Rectangle {
 
     Column {
         id: sensorReadingsRightCol
+        objectName: "sensorReadingsRightCol"
         width: Constants.default_panel_width
         anchors.left: sensorReadingsLeftCol.right
         anchors.leftMargin: Constants.component_margin
@@ -65,14 +123,14 @@ Rectangle {
         spacing: 60
 
         SensorReading {
-            id: temperature
+            objectName: "temperature"
             anchors.horizontalCenter: parent.horizontalCenter
             sensor_heading: "Temperature, C"
             sensor_reading: "0"
         }
 
         SensorReading {
-            id: oxygen
+            objectName: "oxygen"
             anchors.horizontalCenter: parent.horizontalCenter
             sensor_heading: "Oxygen Level, %"
             sensor_reading: "0"
@@ -83,12 +141,15 @@ Rectangle {
         id: runAllSensorsButton
         z: 100
 
+        signal toggledRunAllSensors()
+        signal untoggledRunAllSensors()
+
         anchors.bottom: measurementPanel.top
         anchors.bottomMargin: Constants.component_margin
         anchors.left: parent.left
         anchors.leftMargin: Constants.screen_margin
 
-        width: measurementPanel.width + Constants.component_margin + motorControlPanelCol.width
+        width: measurementPanel.width + Constants.component_margin + motorControlPanel.width
         height: sensorReadingsLeftCol.height - measurementPanel.height
         button_corner_radius: height / 2
 
@@ -103,13 +164,15 @@ Rectangle {
 
         onToggledChanged: {
             if (toggled) {
+                curr_state = 1
                 runAllSensorsButtonShadow.color = Constants.dark_red
-                motorControlPanel.onMotorControlEnabled()
-                sensorControlPanel.enableAll()
+//                motorControlPanel.onMotorControlEnabled()
+//                sensorControlPanel.enableAll()
             } else {
+                curr_state = 0
                 runAllSensorsButtonShadow.color = Constants.dark_green
-                motorControlPanel.onMotorControlDisabled()
-                sensorControlPanel.disableAll()
+//                motorControlPanel.onMotorControlDisabled()
+//                sensorControlPanel.disableAll()
             }
         }
     }

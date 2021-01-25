@@ -18,9 +18,6 @@
 class BioimpedanceWorker : public QThread
 {
     Q_OBJECT
-    Q_PROPERTY(double impedance READ impedance NOTIFY onImpedanceChanged)
-    Q_PROPERTY(bool impedanceRequested READ impedanceRequested NOTIFY
-                   onImpedanceRequestedChanged WRITE setImpedanceRequested)
 
 public:
     void msgCallback(const grasper_msg::ImpedanceDataMessage &msg);
@@ -34,7 +31,7 @@ public slots:
     void setImpedanceRequested(bool impedanceRequested);
 
 signals:
-    void onImpedanceChanged(double impedance);
+    void impedanceChanged(QString);
     void onImpedanceRequestedChanged(bool impedanceRequested);
 
 private:

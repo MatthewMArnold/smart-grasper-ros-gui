@@ -3,17 +3,10 @@ import QtQuick.Controls 2.2
 import Ros 1.0
 import CustomPlot 1.0
 import ImageDisplayer 1.0
+import ValueUpdater 1.0
 import "qrc:/qml"
 
 ApplicationWindow {
-    property int sensorReadingBoxWidth: 100
-
-    property double actualForce: 0
-    property double temperature: 0
-    property double velocityOfSound: 0
-    property double oxygen: 0
-    property double impedance: 0
-
     id: window
     title: "grasper-gui"
     visible: true
@@ -40,12 +33,14 @@ ApplicationWindow {
         criticalErrorIndicator.visible = true
         criticalErrorMessage.text = msg
         dismissErrorButton.visible = dismissable
+        homeScreen.curr_state = 2
     }
 
     function hideCriticalErrorDialogue() {
         console.log("hideCriticalErrorDialogue")
         criticalErrorIndicator.visible = false
         criticalErrorMessage.text = "none"
+        homeScreen.curr_state = 0
     }
 
     signal criticalErrorOKPressed()
@@ -80,7 +75,17 @@ ApplicationWindow {
     }
 
     HomeScreen {
+//        ValueUpdater {
+//            id: testValueUpdater
+//            objectName:"testValueUpdater"
+//            height: 100
+//            width: 100
+////            anchors.left: parent
+//            anchors.right: parent.right
+//        }
+
         id: homeScreen
+        objectName: "homeScreen"
         height: Constants.main_screen_height
         width: Constants.main_screen_width
         anchors.left: parent.left

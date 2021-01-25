@@ -5,7 +5,48 @@ import "qrc:/qml"
 Column {
     id: sensorControlPanelColumn
 
+    function forceSwitchOn() {
+        forceMeasureSwitch.switchOn()
+        forceMeasureSwitch.disable()
+    }
+    function forceSwitchOff() {
+        forceMeasureSwitch.switchOff()
+        forceMeasureSwitch.enable()
+    }
+
     width: Constants.default_panel_width
+
+    function turnOnAllMeasurements() {
+        pulseOxSwitch.switchOn()
+        temperatureSwitch.switchOn()
+        forceMeasureSwitch.switchOn()
+        velOfSoundSwitch.switchOn()
+        impedanceSwitch.switchOn()
+    }
+
+    function turnOffAllMeasurements() {
+        pulseOxSwitch.switchOff()
+        temperatureSwitch.switchOff()
+        forceMeasureSwitch.switchOff()
+        velOfSoundSwitch.switchOff()
+        impedanceSwitch.switchOff()
+    }
+
+    function disableMeasurementButtons() {
+        pulseOxSwitch.disable()
+        temperatureSwitch.disable()
+        forceMeasureSwitch.disable()
+        velOfSoundSwitch.disable()
+        impedanceSwitch.disable()
+    }
+
+    function enableMeasurementButtons() {
+        pulseOxSwitch.enable()
+        temperatureSwitch.enable()
+        forceMeasureSwitch.enable()
+        velOfSoundSwitch.enable()
+        impedanceSwitch.enable()
+    }
 
     Rectangle {
         id: sensorControlPanelHeader
@@ -28,6 +69,7 @@ Column {
 
     Rectangle {
         id: sensorControlPanel
+
         width: parent.width
         height: switchCol.height
         color: Constants.subsection_background_color
@@ -149,4 +191,4 @@ Column {
             }
         }
     }
-        }
+}

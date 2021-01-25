@@ -178,7 +178,7 @@ void MainController::addConnections(QObject *root)
     {
         QObject::connect(
             pulseox,
-            SIGNAL(onOxygenLevelChanged(double, double)),
+            SIGNAL(oxygenLevelChangedWithTime(double, double)),
             pulsePlot,
             SLOT(graphData(double, double)),
             Qt::DirectConnection);

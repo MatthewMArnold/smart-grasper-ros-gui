@@ -13,6 +13,7 @@ QtObject {
 
     readonly property int default_panel_width: 240
     readonly property int default_small_text_rect_height: 50
+    readonly property int measurement_reading_box_width: 100
 
     readonly property int default_small_edge_radius: 8
     readonly property int default_large_edge_radius: 16

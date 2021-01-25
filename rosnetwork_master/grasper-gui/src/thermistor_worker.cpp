@@ -5,6 +5,7 @@
 #include <std_msgs/String.h>
 
 #include "main_controller.hpp"
+#include "value_updater.hpp"
 
 void ThermistorWorker::msgCallback(const grasper_msg::ThermistorMessage &msg)
 {
@@ -19,6 +20,29 @@ void ThermistorWorker::msgCallback(const grasper_msg::ThermistorMessage &msg)
 
 void ThermistorWorker::addConnections(QObject *root)
 {
+    ValueUpdater *temperatureMeasurement = qobject_cast<ValueUpdater *>(
+        MainController::getInstance()
+            ->getRoot()
+            ->findChild<QObject *>("homeScreen")
+            ->findChild<QObject *>("sensorReadingsRightCol")
+            ->findChild<QObject *>("temperature")
+            ->findChild<QObject *>("displayBorder")
+            ->findChild<QObject *>("sensorReading"));
+
+    if (temperatureMeasurement)
+    {
+        QObject::connect(
+            this,
+            SIGNAL(temperatureChanged(QString)),
+            temperatureMeasurement,
+            SLOT(setValue(QString)),
+            Qt::QueuedConnection);
+    }
+    else
+    {
+        qDebug() << "failed to find temperature value to update";
+    }
+
     QObject::connect(
         root,
         SIGNAL(onTemperatureRequestChanged(bool)),
@@ -46,10 +70,7 @@ void ThermistorWorker::setTemperature(double temperature, double time)
         m_temperature = temperature;
         if (m_measureTemperature)
         {
-            MainController::getInstance()->getRoot()->setProperty(
-                "temperature",
-                QVariant(QString::number(m_temperature, 'g', 2)));
-            emit onTemperatureChanged(m_temperature);
+            emit temperatureChanged(QString::number(m_temperature, 'g', 2));
         }
     }
 }
