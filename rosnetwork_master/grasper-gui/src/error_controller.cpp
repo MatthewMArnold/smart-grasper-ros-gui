@@ -62,9 +62,9 @@ void ErrorController::initialize()
     // most recently written error is fixed, a queue of previous
     // errors that are not resolved is maintained and the next
     // most recently added error is added.
-    m_criticalErrorToPriorityMap[ErrorType::SERIAL_NODE_NOT_RUNNING] = 110;
-    m_criticalErrorToPriorityMap[ErrorType::CAMERA_NODE_NOT_RUNNING] = 110;
-    m_criticalErrorToPriorityMap[ErrorType::TEENSY_DISCONNECTED] = 109;
+    m_criticalErrorToPriorityMap[ErrorType::SERIAL_NODE_NOT_RUNNING] = 1;
+    m_criticalErrorToPriorityMap[ErrorType::TEENSY_DISCONNECTED] = 2;
+    m_criticalErrorToPriorityMap[ErrorType::CAMERA_NODE_NOT_RUNNING] = 3;
 }
 
 void ErrorController::addError(ErrorReporter *callingClass, ErrorType error)
@@ -209,25 +209,25 @@ void ErrorController::displayCriticalError()
         emit hideCriticalErrorDialogue();
         return;
     }
-    switch (m_criticalErrorQueue.begin()->type)
-    {
-        case ErrorType::CAMERA_NODE_NOT_RUNNING:
-            emit showCriticalErrorDialogue(
-                "Camera node is not running.\nCheck the Raspberry Pi.",
-                true);
-            break;
-        case ErrorType::SERIAL_NODE_NOT_RUNNING:
-            emit showCriticalErrorDialogue(
-                "Serial node is not running.\nCheck the Raspberry Pi.",
-                true);
-            break;
-        case ErrorType::TEENSY_DISCONNECTED:
-            emit showCriticalErrorDialogue(
-                "The teensy is not connected. Check the connection\nbetween "
-                "the Raspberry Pi and teensy.",
-                false);
-            break;
-        default:
-            break;
-    }
+//    switch (m_criticalErrorQueue.begin()->type)
+//    {
+//        case ErrorType::CAMERA_NODE_NOT_RUNNING:
+//            emit showCriticalErrorDialogue(
+//                "Camera node is not running.\nCheck the Raspberry Pi.",
+//                true);
+//            break;
+//        case ErrorType::SERIAL_NODE_NOT_RUNNING:
+//            emit showCriticalErrorDialogue(
+//                "Serial node is not running.\nCheck the Raspberry Pi.",
+//                true);
+//            break;
+//        case ErrorType::TEENSY_DISCONNECTED:
+//            emit showCriticalErrorDialogue(
+//                "The teensy is not connected. Check the connection\nbetween "
+//                "the Raspberry Pi and teensy.",
+//                false);
+//            break;
+//        default:
+//            break;
+//    }
 }

@@ -1,5 +1,17 @@
 <RCC>
     <qresource prefix="/">
-        <file alias="main.qml">qml/main.qml</file>
+        <file>main.qml</file>
+        <file>qml/qmldir</file>
+        <file>qml/ColoredButton.qml</file>
+        <file>qml/Constants.qml</file>
+        <file>qml/Sidebar.qml</file>
+        <file>qml/CriticalErrorBanner.qml</file>
+        <file>qml/NoncriticalErrorBanner.qml</file>
+        <file>qml/HomeScreen.qml</file>
+        <file>qml/SwitchDelegateWithText.qml</file>
+        <file>qml/MeasurementPanel.qml</file>
+        <file>qml/MotorControlPanel.qml</file>
+        <file>qml/SensorReading.qml</file>
+        <file>qml/images/warning.png</file>
     </qresource>
 </RCC>

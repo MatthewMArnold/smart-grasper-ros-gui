@@ -13,6 +13,7 @@ def pulse_ox_talker():
     ultrasonic_pub = rospy.Publisher('serial/ultrasonicData', UltrasonicDataMessage, queue_size=10)
     impedance_pub = rospy.Publisher('serial/impedanceData', ImpedanceDataMessage, queue_size=10)
     mcu_connected_pub = rospy.Publisher('serial/mcuConnectedHandler', Bool, queue_size=10)
+    serial_node_running_pub = rospy.Publisher('serial/serialNodeRunning', Bool, queue_size=1)
     j = 0
     while not rospy.is_shutdown():
         pulseox_num = math.sin(j * 1)
@@ -26,6 +27,8 @@ def pulse_ox_talker():
         impedance_msg = ImpedanceDataMessage()
         mcu_msg = Bool()
         mcu_msg.data = True
+        serial_running_msg = Bool()
+        serial_running_msg.data = True
 
         for i in range(50):
             pulseox_msg.dataPoint[i].data = pulseox_num
@@ -45,6 +48,7 @@ def pulse_ox_talker():
         ultrasonic_pub.publish(ultrasonic_msg)
         impedance_pub.publish(impedance_msg)
         mcu_connected_pub.publish(mcu_msg)
+        serial_node_running_pub.publish(serial_running_msg)
 
         rate.sleep()
 
