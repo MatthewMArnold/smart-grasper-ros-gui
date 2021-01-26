@@ -20,11 +20,11 @@ Button {
     property color selected_color: primary_color
     property color primary_text_color: "black"
     property color selected_text_color: primary_text_color
-    property string button_text: ""
-    property int text_size: Constants.small_text_size
+    property alias button_text: colored_text.text
+    property alias text_size: colored_text.font.pixelSize
     property bool user_untoggable: true
-    property int button_corner_radius: 0
-    property bool text_bold: false
+    property alias button_corner_radius: background.radius
+    property alias text_bold: colored_text.font.bold
 
     property bool toggled: false
 
@@ -55,6 +55,16 @@ Button {
         }
     }
 
+    function disable() {
+        colored_text.opacity = Constants.default_disabled_opacity
+        enabled = false
+    }
+
+    function enable() {
+        colored_text.opacity = 1.0
+        enabled = true
+    }
+
     onReleased: {
         if (!toggled || user_untoggable) {
             toggleButton()
@@ -63,16 +73,16 @@ Button {
 
     Text {
         id: colored_text
+        text: ""
         anchors.centerIn: parent
-        text: button_text
         color: primary_text_color
         font.pixelSize: text_size
-        font.bold: text_bold
+        font.bold: false
     }
 
     background: Rectangle {
         id: background
         color: primary_color
-        radius: button_corner_radius
+        radius: 0
     }
 }

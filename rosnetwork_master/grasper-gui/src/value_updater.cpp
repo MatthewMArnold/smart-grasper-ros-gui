@@ -16,36 +16,32 @@ void ValueUpdater::setValue(QString value)
     emit valueChanged();
 }
 
+void drawText(QPainter & painter, qreal x, qreal y, Qt::Alignment flags,
+              const QString & text, QRectF * boundingRect = 0)
+{
+    const qreal size = 32767.0;
+    QPointF corner(x, y - size);
+    if (flags & Qt::AlignHCenter) corner.rx() -= size/2.0;
+    else if (flags & Qt::AlignRight) corner.rx() -= size;
+    if (flags & Qt::AlignVCenter) corner.ry() += size/2.0;
+    else if (flags & Qt::AlignTop) corner.ry() += size;
+    else flags |= Qt::AlignBottom;
+    QRectF rect{corner.x(), corner.y(), size, size};
+    painter.drawText(rect, flags, text, boundingRect);
+}
+
 void ValueUpdater::paint(QPainter *painter)
 {
-    // TODO fix
-    QColor color("black");
-    QRect rect(0, 0, 50, 20);
-    for (auto ch : m_value)
-    {
-        //        QImage canvas(rect.width(), rect.height(),
-        //        QImage::Format_RGBA8888); canvas.fill(QColor("transparent"));
-
-        QFont font = painter->font();
-        // font.setPixelSize(20);
-        font.setPixelSize(rect.width());
-        font.setBold(true);
-        painter->setFont(font);
-        painter->setPen(color);
-
-        QRect bounding = QRect(0, 0, rect.width(), rect.height());
-        painter->drawText(
-            0,
-            0,
-            rect.width(),
-            rect.height(),
-            Qt::AlignCenter,
-            ch,
-            &bounding);
-
-        //        QSGTexture *texture =
-        //        this->window()->createTextureFromImage(canvas);
-        //        m_textureList[ch] = texture;
-    }
-    //    qDebug() << "call to paint";
+    // Unhardcode all the things
+    QFont font = painter->font();
+    int pixel_size = 20;
+    font.setPixelSize(pixel_size);
+    painter->setFont(font);
+    painter->setPen(QColor("black"));  // TODO unhardcode
+    QRectF boundingRect;
+    int width = 100;
+    int height = 50;
+    drawText(*painter, width / 2, height / 2, Qt::AlignCenter, m_value, &boundingRect);
+//    QRect rectangle = QRect(0, 0, height, width);
+//    painter->drawText(rectangle, Qt::AlignCenter, m_value, &boundingRect);
 }

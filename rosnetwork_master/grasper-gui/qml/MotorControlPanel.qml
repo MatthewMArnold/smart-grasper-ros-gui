@@ -188,8 +188,9 @@ Column {
             }
 
             onMoved: {
-                onDesiredForceChanged(Math.round(value * maxDesiredForce * 100) / 100)
-                desiredForceSpecified.text = forceController.forceDesired
+                var f = Math.round(value * maxDesiredForce * 100) / 100
+                onDesiredForceChanged(f)
+                desiredForceSpecified.text = f
             }
 
             Text {

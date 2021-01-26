@@ -11,15 +11,16 @@ Rectangle {
     anchors.topMargin: 100
     height: 200
     color: "yellow"
+    property alias text: criticalErrorMessage.text
+    property alias ok_button_visible: dismissErrorButton.visible
 
-    onVisibleChanged: {
-        if (visible) {
-            mainScreen.disableAll()
-        }
+    MouseArea {
+        anchors.fill: parent
+        propagateComposedEvents: false
     }
 
     Row {
-        height: 200
+        height: parent.height
         width: parent.width
         spacing: 20
         Image {

@@ -15,29 +15,29 @@ void ErrorController::addConnections(QObject *root)
     QObject::connect(
         this,
         SIGNAL(showCriticalErrorDialogue(QVariant, QVariant)),
-        root,
+        root->findChild<QObject *>("criticalErrorBanner"),
         SLOT(triggerCriticalErrorDialogue(QVariant, QVariant)),
         Qt::QueuedConnection);
     QObject::connect(
         this,
         SIGNAL(hideCriticalErrorDialogue()),
-        root,
+        root->findChild<QObject *>("criticalErrorBanner"),
         SLOT(hideCriticalErrorDialogue()),
         Qt::QueuedConnection);
     QObject::connect(
         this,
         SIGNAL(showNonurgentErrorDialogue(QVariant)),
-        root,
+        root->findChild<QObject *>("noncriticalErrorBanner"),
         SLOT(triggerNonurgentErrorDialogue(QVariant)),
         Qt::QueuedConnection);
     QObject::connect(
         this,
         SIGNAL(hideNonurgentErrorDialogue()),
-        root,
+        root->findChild<QObject *>("noncriticalErrorBanner"),
         SLOT(hideNonurgentErrorDialogue()),
         Qt::QueuedConnection);
     QObject::connect(
-        root,
+        root->findChild<QObject *>("criticalErrorBanner"),
         SIGNAL(criticalErrorOKPressed()),
         this,
         SLOT(onCriticalMsgOkPressed()),
@@ -209,25 +209,24 @@ void ErrorController::displayCriticalError()
         emit hideCriticalErrorDialogue();
         return;
     }
-    //    switch (m_criticalErrorQueue.begin()->type)
-    //    {
-    //        case ErrorType::CAMERA_NODE_NOT_RUNNING:
-    //            emit showCriticalErrorDialogue(
-    //                "Camera node is not running.\nCheck the Raspberry Pi.",
-    //                true);
-    //            break;
-    //        case ErrorType::SERIAL_NODE_NOT_RUNNING:
-    //            emit showCriticalErrorDialogue(
-    //                "Serial node is not running.\nCheck the Raspberry Pi.",
-    //                true);
-    //            break;
-    //        case ErrorType::TEENSY_DISCONNECTED:
-    //            emit showCriticalErrorDialogue(
-    //                "The teensy is not connected. Check the
-    //                connection\nbetween " "the Raspberry Pi and teensy.",
-    //                false);
-    //            break;
-    //        default:
-    //            break;
-    //    }
+        switch (m_criticalErrorQueue.begin()->type)
+        {
+            case ErrorType::CAMERA_NODE_NOT_RUNNING:
+                emit showCriticalErrorDialogue(
+                    "Camera node is not running.\nCheck the Raspberry Pi.",
+                    true);
+                break;
+            case ErrorType::SERIAL_NODE_NOT_RUNNING:
+                emit showCriticalErrorDialogue(
+                    "Serial node is not running.\nCheck the Raspberry Pi.",
+                    true);
+                break;
+            case ErrorType::TEENSY_DISCONNECTED:
+                emit showCriticalErrorDialogue(
+                    "The teensy is not connected. Check the connection\nbetween " "the Raspberry Pi and teensy.",
+                    true);
+                break;
+            default:
+                break;
+        }
 }

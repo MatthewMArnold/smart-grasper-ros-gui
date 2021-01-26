@@ -69,7 +69,6 @@ void BioimpedanceWorker::setImpedance(double impedance, double time)
         m_impedance = impedance;
         if (m_impedanceRequested)
         {
-            //            qDebug() << impedance;
             emit impedanceChanged(QString::number(m_impedance, 'g', 2));
         }
     }

@@ -11,18 +11,36 @@ Rectangle {
     property int prev_state: 0
     states: [
         State {
+            name: "hidden"
+            when: (curr_state === -1)
+            StateChangeScript {
+                name: "hidden"
+                script: {
+                    visible = false
+                    measurementPanel.turnOffAllMeasurements()
+                    measurementPanel.enableMeasurementButtons()
+                    motorControlPanel.enableMotorControlButtons()
+                    motorControlPanel.turnOffMotorController()
+                    runAllSensorsButton.unsetButtonToggled()
+                    prev_state = curr_state
+                }
+            }
+        },
+        State {
             name: "no sensors running"
             when: (curr_state === 0)
-
             StateChangeScript {
                 name: "no sensors running"
                 script: {
-                    if (prev_state === 1) {
-                        measurementPanel.turnOffAllMeasurements()
-                        measurementPanel.enableMeasurementButtons()
-                        motorControlPanel.enableMotorControlButtons()
-                        motorControlPanel.turnOffMotorController()
+                    if (prev_state === -1) {
+                        visible = true
                     }
+                    measurementPanel.turnOffAllMeasurements()
+                    measurementPanel.enableMeasurementButtons()
+                    motorControlPanel.enableMotorControlButtons()
+                    motorControlPanel.turnOffMotorController()
+                    runAllSensorsButton.unsetButtonToggled()
+                    runAllSensorsButton.enable()
                     prev_state = curr_state
                 }
             }
@@ -50,6 +68,8 @@ Rectangle {
                     prev_state = curr_state
                     measurementPanel.disableMeasurementButtons()
                     motorControlPanel.disableMotorControlButtons()
+                    runAllSensorsButton.unsetButtonToggled()
+                    runAllSensorsButton.disable()
                 }
             }
         }
@@ -141,9 +161,6 @@ Rectangle {
         id: runAllSensorsButton
         z: 100
 
-        signal toggledRunAllSensors()
-        signal untoggledRunAllSensors()
-
         anchors.bottom: measurementPanel.top
         anchors.bottomMargin: Constants.component_margin
         anchors.left: parent.left
@@ -166,13 +183,9 @@ Rectangle {
             if (toggled) {
                 curr_state = 1
                 runAllSensorsButtonShadow.color = Constants.dark_red
-//                motorControlPanel.onMotorControlEnabled()
-//                sensorControlPanel.enableAll()
             } else {
-                curr_state = 0
+                if (curr_state === 1) curr_state = 0
                 runAllSensorsButtonShadow.color = Constants.dark_green
-//                motorControlPanel.onMotorControlDisabled()
-//                sensorControlPanel.disableAll()
             }
         }
     }

@@ -14,10 +14,11 @@ def pulse_ox_talker():
     impedance_pub = rospy.Publisher('serial/impedanceData', ImpedanceDataMessage, queue_size=10)
     mcu_connected_pub = rospy.Publisher('serial/mcuConnectedHandler', Bool, queue_size=10)
     serial_node_running_pub = rospy.Publisher('serial/serialNodeRunning', Bool, queue_size=1)
+    force_pub = rospy.Publisher('serial/motorFeedback', MotorMessageFeedback, queue_size=1)
     j = 0
     while not rospy.is_shutdown():
         pulseox_num = math.sin(j * 1)
-        thermistor_num = float(random.randrange(0, 100)) / 100.0
+        thermistor_num = 40.0 * float(random.randrange(0, 100)) / 100.0
         ultrasonic_num = float(random.randrange(0, 100)) / 100.0
         impedance_num = float(random.randrange(0, 100)) / 100.0
 
@@ -25,6 +26,9 @@ def pulse_ox_talker():
         thermistor_msg = ThermistorMessage()
         ultrasonic_msg = UltrasonicDataMessage()
         impedance_msg = ImpedanceDataMessage()
+        force_msg = MotorMessageFeedback()
+        force_msg.appliedForce = float(random.randrange(0, 100)) / 10.0
+        force_msg.jawPos = float(random.randrange(0, 100)) / 10.0
         mcu_msg = Bool()
         mcu_msg.data = True
         serial_running_msg = Bool()
@@ -49,6 +53,7 @@ def pulse_ox_talker():
         impedance_pub.publish(impedance_msg)
         mcu_connected_pub.publish(mcu_msg)
         serial_node_running_pub.publish(serial_running_msg)
+        force_pub.publish(force_msg)
 
         rate.sleep()
 
