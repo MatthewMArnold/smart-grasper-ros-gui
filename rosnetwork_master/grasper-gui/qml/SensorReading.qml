@@ -6,13 +6,6 @@ import "qrc:/qml"
 Column {
     property alias sensor_heading: header.text
     property alias sensor_reading: displayBorder.display_text
-//    property string sensor_reading: ""
-
-    // Add slot to update sensor value
-    function sensorReadingUpdated(sensorReading) {
-        console.log("hi" + sensorReading)
-//        sensorReading.value = sensorReading
-    }
 
     spacing: Constants.component_margin
 

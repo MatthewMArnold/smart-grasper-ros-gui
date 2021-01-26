@@ -18,14 +18,6 @@
 class ForceControllerWorker : public QThread
 {
     Q_OBJECT
-    Q_PROPERTY(double forceDesired READ forceDesired NOTIFY
-                   onForceDesiredChanged WRITE setForceDesired)
-    Q_PROPERTY(double forceActual READ forceActual NOTIFY onForceActualChanged
-                   WRITE setForceActual)
-    Q_PROPERTY(
-        bool squeeze READ squeeze NOTIFY onSqueezeChanged WRITE setSqueeze)
-    Q_PROPERTY(bool measureForceRequest READ measureForceRequest NOTIFY
-                   onMeasureForceRequestChanged WRITE setMeasureForceRequest)
 
 public:
     void msgCallback(const grasper_msg::MotorMessageFeedback &msg);
@@ -44,7 +36,7 @@ public slots:
 
 signals:
     void onForceDesiredChanged(double force);
-    void onForceActualChanged(QVariant force);
+    void onForceActualChanged(QString force);
     void onSqueezeChanged(bool squeeze);
     void onMeasureForceRequestChanged(QVariant measureForceRequest);
 

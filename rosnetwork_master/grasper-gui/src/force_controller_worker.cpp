@@ -8,6 +8,7 @@
 #include <std_msgs/String.h>
 
 #include "main_controller.hpp"
+#include "value_updater.hpp"
 
 void ForceControllerWorker::msgCallback(
     const grasper_msg::MotorMessageFeedback &msg)
@@ -17,7 +18,6 @@ void ForceControllerWorker::msgCallback(
 
 void ForceControllerWorker::setForceDesired(double force)
 {
-    qDebug() << "force desired set to: " << force;
     if (m_forceDesired != force)
     {
         m_requestMutex.lock();
@@ -32,16 +32,12 @@ void ForceControllerWorker::setForceDesired(double force)
 
 void ForceControllerWorker::setForceActual(double force)
 {
-    qDebug() << "actual force received: " << force;
     if (force != m_forceActual)
     {
         m_forceActual = force;
         if (m_measureForceRequest)
         {
-            MainController::getInstance()->getRoot()->setProperty(
-                "actualForce",
-                QVariant(force));
-            emit onForceActualChanged(m_forceActual);
+            emit onForceActualChanged(QString::number(m_forceActual, 'g', 2));
         }
     }
 }
@@ -78,6 +74,25 @@ void ForceControllerWorker::setMeasureForceRequest(bool measureForceRequest)
 
 void ForceControllerWorker::addConnections(QObject *root)
 {
+    ValueUpdater *forceMeasurement = qobject_cast<ValueUpdater *>(
+        MainController::getInstance()
+            ->getRoot()
+            ->findChild<QObject *>("homeScreen")
+            ->findChild<QObject *>("sensorReadingsLeftCol")
+            ->findChild<QObject *>("actualForce")
+            ->findChild<QObject *>("displayBorder")
+            ->findChild<QObject *>("sensorReading"));
+
+    if (forceMeasurement) {
+        QObject::connect(
+                    this,
+                    SIGNAL(onForceActualChanged(QString)),
+                    forceMeasurement,
+                    SLOT(setValue(QString)),
+                    Qt::QueuedConnection);
+    } else {
+        qDebug() << "failed to find force measurement to display";
+    }
     QObject::connect(
         root,
         SIGNAL(onDesiredForceChanged(double)),

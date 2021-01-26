@@ -28,44 +28,49 @@ ApplicationWindow {
     signal onVelocityOfSoundRequestChanged(bool velocityOfSoundRequested)
     signal onImpedanceRequestChanged(bool impedanceRequested)
 
-    function triggerCriticalErrorDialogue(msg, dismissable) {
-        console.log("triggerCriticalErrorDialogue")
-        criticalErrorIndicator.visible = true
-        criticalErrorMessage.text = msg
-        dismissErrorButton.visible = dismissable
-        homeScreen.curr_state = 2
-    }
-
-    function hideCriticalErrorDialogue() {
-        console.log("hideCriticalErrorDialogue")
-        criticalErrorIndicator.visible = false
-        criticalErrorMessage.text = "none"
-        homeScreen.curr_state = 0
-    }
-
-    signal criticalErrorOKPressed()
-
-    function triggerNonurgentErrorDialogue(msg) {
-        noncriticalErrorIndicator.visible = true
-        noncriticalErrorText.text = msg
-    }
-
-    function hideNonurgentErrorDialogue() {
-        noncriticalErrorIndicator.visible = false
-    }
-
     Sidebar {
         id: sidebar
         anchors.top: parent.top
         anchors.right: parent.right
+        onEnterMainScreen: {
+            homeScreen.curr_state = 0
+            sandboxScreen.state = 0
+            sandboxScreen.visible = true
+        }
+        onEnterSandboxScreen: {
+            homeScreen.curr_state = -1
+            sandboxScreen.visible = true
+        }
     }
 
     NoncriticalErrorBanner {
         id: noncriticalErrorBanner
+        objectName: "noncriticalErrorBanner"
+
+        function triggerNonurgentErrorDialogue(msg) {
+            visible = true
+            text = msg
+        }
+
+        function hideNonurgentErrorDialogue() {
+            visible = false
+        }
     }
 
     CriticalErrorBanner {
         id: criticalErrorBanner
+        objectName: "criticalErrorBanner"
+        function triggerCriticalErrorDialogue(msg, dismissable) {
+            visible = true
+            text = msg
+            ok_button_visible = dismissable
+            if (homeScreen.curr_state !== -1) homeScreen.curr_state = 2
+        }
+        function hideCriticalErrorDialogue() {
+            visible = false
+            if (homeScreen.curr_state !== -1) homeScreen.curr_state = 0
+        }
+        signal criticalErrorOKPressed()
     }
 
     Rectangle {
@@ -75,15 +80,6 @@ ApplicationWindow {
     }
 
     HomeScreen {
-//        ValueUpdater {
-//            id: testValueUpdater
-//            objectName:"testValueUpdater"
-//            height: 100
-//            width: 100
-////            anchors.left: parent
-//            anchors.right: parent.right
-//        }
-
         id: homeScreen
         objectName: "homeScreen"
         height: Constants.main_screen_height

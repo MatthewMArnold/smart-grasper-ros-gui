@@ -8,6 +8,8 @@ Rectangle {
     color: Constants.background_color
 
     property string curr_state: "mainButton"
+    signal enterMainScreen
+    signal enterSandboxScreen
 
     /**
      * define states and state transitions for the different screens.
@@ -18,7 +20,10 @@ Rectangle {
             when: (curr_state == "mainButton")
             StateChangeScript {
                 name: "mainButtonScript"
-                script: sandboxButton.unsetButtonToggled()
+                script: {
+                    sandboxButton.unsetButtonToggled()
+                    enterMainScreen()
+                }
             }
         },
         State {
@@ -28,6 +33,7 @@ Rectangle {
                 name:  "sandboxButtonScript"
                 script: {
                     mainButton.unsetButtonToggled()
+                    enterSandboxScreen()
                 }
             }
         }
@@ -74,6 +80,7 @@ Rectangle {
                 primary_text_color: Constants.light_purple
                 button_text: "main"
                 user_untoggable: false
+                text_bold: true
             }
 
             ColoredButton {
@@ -94,6 +101,7 @@ Rectangle {
                 primary_text_color: Constants.light_purple
                 button_text: "sandbox"
                 user_untoggable: false
+                text_bold: true
             }
         }
     }
