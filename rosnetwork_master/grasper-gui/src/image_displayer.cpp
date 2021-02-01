@@ -50,8 +50,7 @@ void ImageDisplayer::initImageDisplayer()
     m_imageNodeRunningTimeout->start(IMAGE_NODE_ERROR_TIMEOUT);
 }
 
-void ImageDisplayer::handleIncomingImage(
-    const sensor_msgs::ImageConstPtr &image)
+void ImageDisplayer::handleIncomingImage(const sensor_msgs::ImageConstPtr &image)
 {
     //    qDebug() << "new image received";
     cv_bridge::CvImagePtr cv_ptr;
@@ -59,8 +58,7 @@ void ImageDisplayer::handleIncomingImage(
     setImageNodeConnected(true);
     try
     {
-        m_cvPtr =
-            cv_bridge::toCvCopy(image, sensor_msgs::image_encodings::BGR8);
+        m_cvPtr = cv_bridge::toCvCopy(image, sensor_msgs::image_encodings::BGR8);
     }
     catch (cv_bridge::Exception &e)
     {
@@ -71,10 +69,7 @@ void ImageDisplayer::handleIncomingImage(
 
 void ImageDisplayer::imageNodeDisconnected() { setImageNodeConnected(false); }
 
-void ImageDisplayer::errorCleared(ErrorController::ErrorType type)
-{
-    Q_UNUSED(type);
-}
+void ImageDisplayer::errorCleared(ErrorController::ErrorType type) { Q_UNUSED(type); }
 
 void ImageDisplayer::paint(QPainter *painter)
 {
@@ -84,12 +79,7 @@ void ImageDisplayer::paint(QPainter *painter)
     }
     Mat img = m_cvPtr->image;
     cv::resize(img, img, Size(width(), height()), 0, 0, INTER_CUBIC);
-    QImage imdisplay(
-        (uchar *)img.data,
-        img.cols,
-        img.rows,
-        img.step,
-        QImage::Format_RGB888);
+    QImage imdisplay((uchar *)img.data, img.cols, img.rows, img.step, QImage::Format_RGB888);
     imdisplay = imdisplay.rgbSwapped();
     painter->drawPixmap(0, 0, QPixmap::fromImage(imdisplay));
 }

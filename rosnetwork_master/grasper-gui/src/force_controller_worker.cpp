@@ -11,10 +11,10 @@
 #include "main_controller.hpp"
 #include "value_updater.hpp"
 
-void ForceControllerWorker::msgCallback(
-    const grasper_msg::MotorMessageFeedback &msg)
+void ForceControllerWorker::msgCallback(const grasper_msg::MotorMessageFeedback &msg)
 {
-    setForceActual(msg.appliedForce);  // todo time
+    setForceActual(msg.appliedForce, msg.time);  // todo time
+    setPositionActual(msg.jawPos, msg.time);
 }
 
 void ForceControllerWorker::setForceDesired(double force)
@@ -31,7 +31,7 @@ void ForceControllerWorker::setForceDesired(double force)
     }
 }
 
-void ForceControllerWorker::setForceActual(double force)
+void ForceControllerWorker::setForceActual(double force, double time)
 {
     if (force != m_forceActual)
     {
@@ -40,9 +40,9 @@ void ForceControllerWorker::setForceActual(double force)
         {
             emit onForceActualChanged(QString::number(m_forceActual, 'g', 2));
             QMutexLocker lock(&m_graphControlLock);
-            if (m_graphControl)
+            if (m_forceGraphControl)
             {
-                onForceActualChangedWithTime(m_forceActual, 1);  // todo time
+                onForceActualChangedWithTime(m_forceActual, time);
             }
         }
     }
@@ -63,9 +63,7 @@ void ForceControllerWorker::setSqueeze(bool squeeze)
     }
 }
 
-void ForceControllerWorker::setMeasureForceRequest(
-    bool measureForceRequest,
-    int index)
+void ForceControllerWorker::setMeasureForceRequest(bool measureForceRequest, int index)
 {
     Q_UNUSED(index);
     qDebug() << "force requested set to: " << measureForceRequest;
@@ -80,11 +78,20 @@ void ForceControllerWorker::setMeasureForceRequest(
 void ForceControllerWorker::addConnections(QObject *root)
 {
     ValueUpdater *forceMeasurement = qobject_cast<ValueUpdater *>(
-        root->findChild<QObject *>("sensorReading"));
+        root->findChild<QObject *>("actualForce")->findChild<QObject *>("sensorReading"));
     QObject::connect(
         this,
         SIGNAL(onForceActualChanged(QString)),
         forceMeasurement,
+        SLOT(setValue(QString)),
+        Qt::QueuedConnection);
+
+    ValueUpdater *positionMeasurement = qobject_cast<ValueUpdater *>(
+        root->findChild<QObject *>("jawPosition")->findChild<QObject *>("sensorReading"));
+    QObject::connect(
+        this,
+        SIGNAL(onPositionActualChanged(QString)),
+        positionMeasurement,
         SLOT(setValue(QString)),
         Qt::QueuedConnection);
 
@@ -98,9 +105,16 @@ void ForceControllerWorker::addConnections(QObject *root)
         SLOT(graphForce(bool)),
         Qt::DirectConnection);
 
+    QObject *positionRadio = root->findChild<QObject *>("jawPosition");
+    QObject::connect(
+        positionRadio,
+        SIGNAL(onSelected(bool)),
+        this,
+        SLOT(graphPosition(bool)),
+        Qt::DirectConnection);
+
     CustomPlotItem *graph = qobject_cast<CustomPlotItem *>(
-        MainController::getInstance()->getRoot()->findChild<QObject *>(
-            "pulsePlot"));
+        MainController::getInstance()->getRoot()->findChild<QObject *>("pulsePlot"));
     QObject::connect(
         this,
         SIGNAL(onForceActualChangedWithTime(double, double)),
@@ -108,8 +122,14 @@ void ForceControllerWorker::addConnections(QObject *root)
         SLOT(graphData(double, double)),
         Qt::DirectConnection);
 
-    QObject *measureForceSwitch =
-        root->findChild<QObject *>("forceMeasurementSwitch");
+    QObject::connect(
+        this,
+        SIGNAL(onPositionActualChangedWithTime(double, double)),
+        graph,
+        SLOT(graphData(double, double)),
+        Qt::DirectConnection);
+
+    QObject *measureForceSwitch = root->findChild<QObject *>("forceMeasurementSwitch");
     QObject::connect(
         measureForceSwitch,
         SIGNAL(sliderToggled(bool, int)),
@@ -151,35 +171,56 @@ void ForceControllerWorker::run()
 
     if (n == nullptr) return;
 
-    m_motorRequestPub =
-        n->advertise<grasper_msg::MotorRequestMessage>("serial/motor", 1000);
-    m_motorMsgSubscriber = n->subscribe(
-        "serial/motorFeedback",
-        1000,
-        &ForceControllerWorker::msgCallback,
-        this);
-    //    ros::Rate loopRate(10);
-
-    // TODO add constant request polling in case messages fail to send.
-    //    while (ros::ok())
-    //    {
-    //        ros::spinOnce();
-    //        loopRate.sleep();
-    //    }
+    m_motorRequestPub = n->advertise<grasper_msg::MotorRequestMessage>("serial/motor", 1000);
+    m_motorMsgSubscriber =
+        n->subscribe("serial/motorFeedback", 1000, &ForceControllerWorker::msgCallback, this);
 }
 
 void ForceControllerWorker::graphForce(bool selected)
 {
     if (selected)
     {
-        CustomPlotItem *graph = qobject_cast<CustomPlotItem *>(
-            MainController::getInstance()
-                ->getRoot()
-                ->findChild<QObject *>("homeScreen")
-                ->findChild<QObject *>("pulsePlot"));
-        graph->setYAxisLabel("force (N)");
+        CustomPlotItem *graph =
+            qobject_cast<CustomPlotItem *>(MainController::getInstance()
+                                               ->getRoot()
+                                               ->findChild<QObject *>("homeScreen")
+                                               ->findChild<QObject *>("pulsePlot"));
+        graph->setYAxisLabel("Force, N");
         graph->initCustomPlot();
     }
     QMutexLocker lock(&m_graphControlLock);
-    m_graphControl = selected;
+    m_forceGraphControl = selected;
+}
+
+void ForceControllerWorker::graphPosition(bool selected)
+{
+    if (selected)
+    {
+        CustomPlotItem *graph =
+            qobject_cast<CustomPlotItem *>(MainController::getInstance()
+                                               ->getRoot()
+                                               ->findChild<QObject *>("homeScreen")
+                                               ->findChild<QObject *>("pulsePlot"));
+        graph->setYAxisLabel("Position, mm");
+        graph->initCustomPlot();
+    }
+    QMutexLocker lock(&m_graphControlLock);
+    m_positionGraphControl = selected;
+}
+
+void ForceControllerWorker::setPositionActual(double position, double time)
+{
+    if (position != m_positionActual)
+    {
+        m_positionActual = position;
+        if (m_measureForceRequest)
+        {
+            emit onPositionActualChanged(QString::number(m_positionActual, 'g', 2));
+        }
+    }
+    QMutexLocker lock(&m_graphControlLock);
+    if (m_positionGraphControl)
+    {
+        emit onPositionActualChangedWithTime(m_positionActual, time);
+    }
 }

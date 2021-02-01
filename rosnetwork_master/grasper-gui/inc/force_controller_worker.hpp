@@ -30,20 +30,25 @@ public:
 
 public slots:
     void setForceDesired(double force);
-    void setForceActual(double force);
+    void setForceActual(double force, double time);
+    void setPositionActual(double position, double time);
     void setSqueeze(bool squeeze);
     void setMeasureForceRequest(bool measureForceRequest, int index);
     void graphForce(bool);
+    void graphPosition(bool);
 
 signals:
     void onForceDesiredChanged(double force);
     void onForceActualChanged(QString force);
     void onSqueezeChanged(bool squeeze);
     void onForceActualChangedWithTime(double, double);
+    void onPositionActualChanged(QString);
+    void onPositionActualChangedWithTime(double, double);
 
 private:
-    double m_forceDesired = 0.0f;
-    double m_forceActual = 10.0f;
+    double m_forceDesired = 0.0;
+    double m_forceActual = 0.0;
+    double m_positionActual = 0.0;
     bool m_squeeze = false;
     bool m_measureForceRequest = false;
     ros::Publisher m_motorRequestPub;
@@ -51,14 +56,12 @@ private:
     ros::Subscriber m_motorMsgSubscriber;
 
     QMutex m_graphControlLock;
-    bool m_graphControl = false;
+    bool m_forceGraphControl = false;
+    bool m_positionGraphControl = false;
 
     void run() override;
 
-    void sendMotorRequest(
-        double force,
-        bool enableMotorController,
-        bool measureForce);
+    void sendMotorRequest(double force, bool enableMotorController, bool measureForce);
 };
 
 #endif  // FORCE_CONTROLLER_WORKER_HPP_

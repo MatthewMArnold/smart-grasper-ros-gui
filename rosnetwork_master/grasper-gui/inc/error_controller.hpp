@@ -59,11 +59,7 @@ private:
               priority(0)
         {
         }
-        ErrorMsg(
-            ErrorReporter *callingClass,
-            ErrorType type,
-            qint64 timeAdded,
-            uint8_t priority)
+        ErrorMsg(ErrorReporter *callingClass, ErrorType type, qint64 timeAdded, uint8_t priority)
             : callingClass(callingClass),
               type(type),
               timeAdded(timeAdded),
@@ -90,8 +86,7 @@ private:
             }
             else
             {
-                return static_cast<int>(msg1.type) <
-                       static_cast<int>(msg2.type);
+                return static_cast<int>(msg1.type) < static_cast<int>(msg2.type);
             }
         }
     };

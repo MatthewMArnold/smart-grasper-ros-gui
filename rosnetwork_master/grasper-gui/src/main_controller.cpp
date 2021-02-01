@@ -3,7 +3,6 @@
 #include <QDebug>
 #include <QQmlContext>
 
-#include "bioimpedance_worker.hpp"
 #include "custom_plot_item.hpp"
 #include "error_controller.hpp"
 #include "force_controller_worker.hpp"
@@ -17,15 +16,13 @@ void SensorRequestWorker::run()
 
     if (n == nullptr) return;
 
-    ros::Publisher pub = n->advertise<grasper_msg::SensorRequestMessage>(
-        "serial/sensorEnable",
-        1000);
+    ros::Publisher pub =
+        n->advertise<grasper_msg::SensorRequestMessage>("serial/sensorEnable", 1000);
 
     ros::Rate loopRate(100);
 
     grasper_msg::SensorRequestMessage oldMsg;
-    grasper_msg::SensorRequestMessage newMsg =
-        MainController::getInstance()->getSensorRequestMsg();
+    grasper_msg::SensorRequestMessage newMsg = MainController::getInstance()->getSensorRequestMsg();
     pub.publish(newMsg);
     while (ros::ok())
     {
@@ -47,20 +44,8 @@ MainController::~MainController()
     forceControllerThread.quit();
     forceControllerThread.wait();
 
-    thermistorThread.quit();
-    thermistorThread.wait();
-
-    pulseoxThread.quit();
-    pulseoxThread.wait();
-
-    ultrasonicThread.quit();
-    ultrasonicThread.wait();
-
     sendSensorRequestThread.quit();
     sendSensorRequestThread.wait();
-
-    bioimpedanceThread.quit();
-    bioimpedanceThread.wait();
 
     delete forceController;
     delete thermistor;
@@ -87,17 +72,13 @@ void MainController::initialize(QQmlApplicationEngine *engine)
     if (engine == nullptr) return;
 
     forceController = new ForceControllerWorker();
-    thermistor = new ThermistorWorker();
-    pulseox = new PulseoxWorker();
-    ultrasonic = new UltrasonicWorker();
-    bioimpedance = new BioimpedanceWorker();
+    thermistor = new ThermistorMeasurement();
+    pulseox = new PulseoxMeasurement();
+    ultrasonic = new UltrasonicMeasurement();
+    bioimpedance = new ImpedanceMeasurement();
     sensorRequest = new SensorRequestWorker();
 
-    engine->rootContext()->setContextProperty(
-        "forceController",
-        forceController);
-
-    pulseox->initPulseOxGraph();
+    engine->rootContext()->setContextProperty("forceController", forceController);
 
     m_teensyConnectedSub = m_nodeHandle.subscribe(
         "serial/mcuConnectedHandler",
@@ -117,54 +98,51 @@ void MainController::addConnections(QObject *root)
     this->root = root;
 
     forceController->addConnections(root);
-    thermistor->addConnections(root);
-    ultrasonic->addConnections(root);
-    pulseox->addConnections(root);
-    bioimpedance->addConnections(root);
 
-    connect(
-        &forceControllerThread,
-        &QThread::finished,
-        forceController,
-        &QObject::deleteLater);
+    CustomPlotItem *graph = qobject_cast<CustomPlotItem *>(
+        MainController::getInstance()->getRoot()->findChild<QObject *>("pulsePlot"));
+
+    QObject *thermistorRadioButton = root->findChild<QObject *>("temperature");
+    ValueUpdater *thermistorMeasurement =
+        qobject_cast<ValueUpdater *>(thermistorRadioButton->findChild<QObject *>("sensorReading"));
+    thermistor->addConnections(
+        thermistorMeasurement,
+        graph,
+        thermistorRadioButton,
+        root->findChild<QObject *>("temperatureSwitch"));
+
+    QObject *ultrasonicRadioButton = root->findChild<QObject *>("velOfSound");
+    ValueUpdater *ultrasonicMeasurement =
+        qobject_cast<ValueUpdater *>(ultrasonicRadioButton->findChild<QObject *>("sensorReading"));
+    ultrasonic->addConnections(
+        ultrasonicMeasurement,
+        graph,
+        ultrasonicRadioButton,
+        root->findChild<QObject *>("velOfSoundSwitch"));
+
+    QObject *pulseoxRadioButton = root->findChild<QObject *>("oxygen");
+    ValueUpdater *pulseoxMeasurement =
+        qobject_cast<ValueUpdater *>(pulseoxRadioButton->findChild<QObject *>("sensorReading"));
+    pulseox->addConnections(
+        pulseoxMeasurement,
+        graph,
+        pulseoxRadioButton,
+        root->findChild<QObject *>("pulseOxSwitch"));
+
+    QObject *impedanceRadioButton = root->findChild<QObject *>("impedance");
+    ValueUpdater *impedanceMeasurement =
+        qobject_cast<ValueUpdater *>(impedanceRadioButton->findChild<QObject *>("sensorReading"));
+    bioimpedance->addConnections(
+        impedanceMeasurement,
+        graph,
+        impedanceRadioButton,
+        root->findChild<QObject *>("impedanceSwitch"));
+
+    graph->initCustomPlot();
+
+    connect(&forceControllerThread, &QThread::finished, forceController, &QObject::deleteLater);
     forceController->moveToThread(&forceControllerThread);
     forceController->start();
-
-    connect(
-        &thermistorThread,
-        &QThread::finished,
-        thermistor,
-        &QObject::deleteLater);
-    thermistor->moveToThread(&thermistorThread);
-    thermistor->start();
-
-    connect(&pulseoxThread, &QThread::finished, pulseox, &QObject::deleteLater);
-    pulseox->moveToThread(&pulseoxThread);
-    pulseox->start();
-
-    connect(
-        &ultrasonicThread,
-        &QThread::finished,
-        ultrasonic,
-        &QObject::deleteLater);
-    ultrasonic->moveToThread(&ultrasonicThread);
-    ultrasonic->start();
-
-    connect(
-        &bioimpedanceThread,
-        &QThread::finished,
-        bioimpedance,
-        &QObject::deleteLater);
-    bioimpedance->moveToThread(&bioimpedanceThread);
-    bioimpedance->start();
-
-    connect(
-        &sendSensorRequestThread,
-        &QThread::finished,
-        sensorRequest,
-        &QObject::deleteLater);
-    sensorRequest->moveToThread(&sendSensorRequestThread);
-    sensorRequest->start();
 
     QObject::connect(
         &m_teensyConnectedTimeout,

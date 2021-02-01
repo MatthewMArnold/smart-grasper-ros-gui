@@ -4,9 +4,7 @@
 #include <QPainter>
 #include <QRect>
 
-ValueUpdater::ValueUpdater(QQuickItem *parent) : m_parent(parent), m_value("0")
-{
-}
+ValueUpdater::ValueUpdater(QQuickItem *parent) : m_parent(parent), m_value("0") {}
 
 void ValueUpdater::setValue(QString value)
 {
@@ -51,13 +49,7 @@ void ValueUpdater::paint(QPainter *painter)
     QRectF boundingRect;
     int width = 100;
     int height = 50;
-    drawText(
-        *painter,
-        width / 2,
-        height / 2,
-        Qt::AlignCenter,
-        m_value,
-        &boundingRect);
+    drawText(*painter, width / 2, height / 2, Qt::AlignCenter, m_value, &boundingRect);
     //    QRect rectangle = QRect(0, 0, height, width);
     //    painter->drawText(rectangle, Qt::AlignCenter, m_value, &boundingRect);
 }

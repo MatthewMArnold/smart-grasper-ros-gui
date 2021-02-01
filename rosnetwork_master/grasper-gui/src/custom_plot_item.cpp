@@ -16,16 +16,8 @@ CustomPlotItem::CustomPlotItem(QQuickItem* parent)
     // setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::AllButtons);
 
-    connect(
-        this,
-        &QQuickPaintedItem::widthChanged,
-        this,
-        &CustomPlotItem::updateCustomPlotSize);
-    connect(
-        this,
-        &QQuickPaintedItem::heightChanged,
-        this,
-        &CustomPlotItem::updateCustomPlotSize);
+    connect(this, &QQuickPaintedItem::widthChanged, this, &CustomPlotItem::updateCustomPlotSize);
+    connect(this, &QQuickPaintedItem::heightChanged, this, &CustomPlotItem::updateCustomPlotSize);
 }
 
 CustomPlotItem::~CustomPlotItem()
@@ -42,11 +34,7 @@ void CustomPlotItem::initCustomPlot()
 
     setupPulseoxData(m_CustomPlot);
 
-    connect(
-        m_CustomPlot,
-        &QCustomPlot::afterReplot,
-        this,
-        &CustomPlotItem::onCustomReplot);
+    connect(m_CustomPlot, &QCustomPlot::afterReplot, this, &CustomPlotItem::onCustomReplot);
 
     m_CustomPlot->replot();
 }
@@ -65,30 +53,17 @@ void CustomPlotItem::paint(QPainter* painter)
     }
 }
 
-void CustomPlotItem::mousePressEvent(QMouseEvent* event)
-{
-    routeMouseEvents(event);
-}
+void CustomPlotItem::mousePressEvent(QMouseEvent* event) { routeMouseEvents(event); }
 
-void CustomPlotItem::mouseReleaseEvent(QMouseEvent* event)
-{
-    routeMouseEvents(event);
-}
+void CustomPlotItem::mouseReleaseEvent(QMouseEvent* event) { routeMouseEvents(event); }
 
-void CustomPlotItem::mouseMoveEvent(QMouseEvent* event)
-{
-    routeMouseEvents(event);
-}
+void CustomPlotItem::mouseMoveEvent(QMouseEvent* event) { routeMouseEvents(event); }
 
-void CustomPlotItem::mouseDoubleClickEvent(QMouseEvent* event)
-{
-    routeMouseEvents(event);
-}
+void CustomPlotItem::mouseDoubleClickEvent(QMouseEvent* event) { routeMouseEvents(event); }
 
 void CustomPlotItem::graphClicked(QCPAbstractPlottable* plottable)
 {
-    qDebug() << Q_FUNC_INFO
-             << QString("Clicked on graph '%1 ").arg(plottable->name());
+    qDebug() << Q_FUNC_INFO << QString("Clicked on graph '%1 ").arg(plottable->name());
 }
 
 void CustomPlotItem::routeMouseEvents(QMouseEvent* event)
@@ -115,8 +90,7 @@ void CustomPlotItem::updateCustomPlotSize()
 
 void CustomPlotItem::onCustomReplot() { update(); }
 
-void CustomPlotItem::setupPulseoxData(
-    QCustomPlot* customPlot)  //, PulseoxWorker *pulseox)
+void CustomPlotItem::setupPulseoxData(QCustomPlot* customPlot)  //, PulseoxWorker *pulseox)
 {
     customPlot->addGraph();
     customPlot->xAxis->setLabel(m_xAxisLabel);
