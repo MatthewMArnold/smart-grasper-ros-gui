@@ -137,3 +137,17 @@ void CustomPlotItem::graphData(double data, double time)
     m_CustomPlot->xAxis->setRange(time, m_timeToDisplay, Qt::AlignRight);
     m_CustomPlot->replot();
 }
+
+void CustomPlotItem::setXAxisLabel(QString label)
+{
+    m_xAxisLabel = label;
+    m_CustomPlot->xAxis->setLabel(label);
+    m_CustomPlot->replot();
+}
+
+void CustomPlotItem::setYAxisLabel(QString label)
+{
+    m_yAxisLabel = label;
+    m_CustomPlot->yAxis->setLabel(label);
+    m_CustomPlot->replot();
+}

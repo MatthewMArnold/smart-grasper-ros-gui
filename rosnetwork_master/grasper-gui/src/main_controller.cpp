@@ -21,7 +21,7 @@ void SensorRequestWorker::run()
         "serial/sensorEnable",
         1000);
 
-    ros::Rate loopRate(10);
+    ros::Rate loopRate(100);
 
     grasper_msg::SensorRequestMessage oldMsg;
     grasper_msg::SensorRequestMessage newMsg =
@@ -30,10 +30,7 @@ void SensorRequestWorker::run()
     while (ros::ok())
     {
         newMsg = MainController::getInstance()->getSensorRequestMsg();
-        if (newMsg.enablePulseOx != oldMsg.enablePulseOx ||
-            newMsg.enableTemperature != oldMsg.enableTemperature ||
-            newMsg.enableVelocityOfSound != oldMsg.enableVelocityOfSound ||
-            newMsg.enableImpedance != oldMsg.enableImpedance)
+        if (newMsg != oldMsg)
         {
             pub.publish(newMsg);
         }
@@ -169,21 +166,6 @@ void MainController::addConnections(QObject *root)
     sensorRequest->moveToThread(&sendSensorRequestThread);
     sensorRequest->start();
 
-    auto pulsePlot = this->getRoot()->findChild<CustomPlotItem *>("pulsePlot");
-    if (pulsePlot == nullptr)
-    {
-        qDebug() << "graphing will not work, failed to find a pulsePlot";
-    }
-    else
-    {
-        QObject::connect(
-            pulseox,
-            SIGNAL(oxygenLevelChangedWithTime(double, double)),
-            pulsePlot,
-            SLOT(graphData(double, double)),
-            Qt::DirectConnection);
-    }
-
     QObject::connect(
         &m_teensyConnectedTimeout,
         SIGNAL(timeout()),
@@ -216,31 +198,35 @@ void MainController::teensyDisconnected() { setTeensyConnected(false); }
 
 void MainController::serialNodeDisconnected() { setSerialNodeRunning(false); }
 
-void MainController::setEnablePulseOx(bool enabled)
+void MainController::setEnablePulseOx(bool enabled, int index)
 {
     sensorRequestLock.lock();
     m_sensorRequestMessage.enablePulseOx = enabled;
+    m_sensorRequestMessage.pulseoxIndex = index;
     sensorRequestLock.unlock();
 }
 
-void MainController::setEnableTemperature(bool enabled)
+void MainController::setEnableTemperature(bool enabled, int index)
 {
     sensorRequestLock.lock();
     m_sensorRequestMessage.enableTemperature = enabled;
+    m_sensorRequestMessage.temperatureIndex = index;
     sensorRequestLock.unlock();
 }
 
-void MainController::setEnableVelocityOfSound(bool enabled)
+void MainController::setEnableVelocityOfSound(bool enabled, int index)
 {
     sensorRequestLock.lock();
     m_sensorRequestMessage.enableVelocityOfSound = enabled;
+    m_sensorRequestMessage.velocityOfSoundIndex = index;
     sensorRequestLock.unlock();
 }
 
-void MainController::setEnableImpedance(bool enabled)
+void MainController::setEnableImpedance(bool enabled, int index)
 {
     sensorRequestLock.lock();
     m_sensorRequestMessage.enableImpedance = enabled;
+    m_sensorRequestMessage.impedanceIndex = index;
     sensorRequestLock.unlock();
 }
 
@@ -294,4 +280,13 @@ grasper_msg::SensorRequestMessage MainController::getSensorRequestMsg()
     grasper_msg::SensorRequestMessage msg = m_sensorRequestMessage;
     sensorRequestLock.unlock();
     return msg;
+}
+
+void MainController::graphMediator(double y, double x, bool hasControl)
+{
+    qDebug() << "received msg " << y << ", " << x;
+    if (hasControl)
+    {
+        emit graphData(y, x);
+    }
 }

@@ -5,7 +5,7 @@ import "qrc:/qml"
 Column {
     property bool motorControllerEnabled: false
 
-    width: Constants.default_panel_width
+    width: Constants.default_motor_control_panel_width
 
     signal motorControllerTurnedOn
     signal motorControllerTurnedOff
@@ -67,39 +67,6 @@ Column {
         readonly property int default_motor_button_width: 80
         readonly property int default_motor_button_height: 40
 
-//        function onMotorControlEnabled() {
-//            console.log("motor control enabled")
-//            closeButton.enabled = false
-//            releaseButton.enabled = true
-//            desiredForceSlider.enabled = true
-//            desiredForceText.opacity = 1
-//            desiredForceSpecified.opacity = 1
-//            forceSwitch.enabled = 0
-//            if (forceSwitch.position === 0) {
-//                forceSwitch.toggle()
-//            }
-//            onForceRequestChanged(true)
-//            onMotorClosedRequested(true)
-//        }
-
-//        function onMotorControlDisabled() {
-//            console.log("motor control disabled")
-//            closeButton.enabled = true
-//            releaseButton.enabled = false
-//            desiredForceSlider.enabled = false
-//            desiredForceText.opacity = 0.25
-//            desiredForceSpecified.opacity = 0.25
-//            desiredForceSlider.value = 0
-//            onDesiredForceChanged(0)
-//            desiredForceSpecified.text = forceController.forceDesired
-//            forceSwitch.enabled = 1
-//            if (forceSwitch.position === 1) {
-//                forceSwitch.toggle()
-//            }
-//            onForceRequestChanged(false)
-//            onMotorClosedRequested(false)
-//        }
-
         RoundButton {
             id: releaseButton
             anchors.top: parent.top
@@ -110,7 +77,10 @@ Column {
             height: motorControlPanel.default_motor_button_height
             enabled: false
 
-            onClicked: turnOffMotorController()
+            onClicked: {
+                curr_state = 0
+                turnOffMotorController()
+            }
 
             Text {
                 text: "Release"
@@ -138,7 +108,10 @@ Column {
             width: motorControlPanel.default_motor_button_width
             height: motorControlPanel.default_motor_button_height
 
-            onClicked: turnOnMotorController()
+            onClicked:{
+                curr_state = 3
+                turnOnMotorController()
+            }
 
             background: Rectangle {
                 id: closeButtonBackground

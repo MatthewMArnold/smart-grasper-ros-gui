@@ -2,6 +2,7 @@
 #define PULSEOX_WORKER_HPP
 
 #include <QApplication>
+#include <QMutex>
 #include <QObject>
 #include <QQmlApplicationEngine>
 #include <QString>
@@ -14,9 +15,6 @@
 class PulseoxWorker : public QThread
 {
     Q_OBJECT
-    Q_PROPERTY(double oxygenLevel READ oxygenLevel NOTIFY oxygenLevelChanged)
-    Q_PROPERTY(bool measurePulseox READ measurePulseox NOTIFY
-                   onMeasurePulseoxChanged WRITE setMeasurePulseox)
 
 public:
     void msgCallback(const grasper_msg::PulseOxRxMessage &msg);
@@ -28,17 +26,20 @@ public:
 
 public slots:
     void setOxygenLevel(double oxygenLevel, double time);
-    void setMeasurePulseox(bool measurePulseox);
+    void setMeasurePulseox(bool measurePulseox, int index);
+    void graphPulseox(bool);
 
 signals:
     void oxygenLevelChanged(QString oxygenLevel);
     void oxygenLevelChangedWithTime(double oxygenLevel, double time);
-    void onMeasurePulseoxChanged(bool measurePulseox);
+    void onMeasurePulseoxChanged(bool measurePulseox, int index);
 
 private:
     double m_oxygenLevel;
     bool m_measurePulseox;
     ros::Subscriber m_pulseoxMsgSubscriber;
+    QMutex m_graphControlLock;
+    bool m_graphControl = false;
 
     QVector<double> m_pulseoxX;
     QVector<double> m_pulseoxY;

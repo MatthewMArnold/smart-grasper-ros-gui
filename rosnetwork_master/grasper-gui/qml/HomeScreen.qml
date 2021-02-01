@@ -1,5 +1,5 @@
 import QtQuick 2.9
-import QtQuick.Controls 2.2
+import QtQuick.Controls 1.4
 import CustomPlot 1.0
 import ImageDisplayer 1.0
 import "qrc:/qml"
@@ -36,7 +36,7 @@ Rectangle {
                         visible = true
                     }
                     measurementPanel.turnOffAllMeasurements()
-                    measurementPanel.enableMeasurementButtons()
+                    measurementPanel.disableMeasurementButtons()
                     motorControlPanel.enableMotorControlButtons()
                     motorControlPanel.turnOffMotorController()
                     runAllSensorsButton.unsetButtonToggled()
@@ -72,11 +72,23 @@ Rectangle {
                     runAllSensorsButton.disable()
                 }
             }
+        },
+        State {
+            name: "motor controller running"
+            when: (curr_state === 3)
+            StateChangeScript {
+                name: "motor controller running"
+                script: {
+                    prev_state = curr_state
+                    measurementPanel.enableMeasurementButtons()
+                }
+            }
         }
     ]
 
     MeasurementPanel {
         id: measurementPanel
+        objectName: "measurementPanel"
         anchors.left: parent.left
         anchors.leftMargin: Constants.screen_margin
         anchors.bottom: parent.bottom
@@ -89,9 +101,6 @@ Rectangle {
         onMotorControllerTurnedOn: {
             measurementPanel.forceSwitchOn()
         }
-        onMotorControllerTurnedOff: {
-            measurementPanel.forceSwitchOff()
-        }
 
         anchors.left: measurementPanel.right
         anchors.leftMargin: Constants.component_margin
@@ -100,60 +109,76 @@ Rectangle {
         height: measurementPanel.height
     }
 
+    ExclusiveGroup {
+        id: graphDisplayButtonGroup
+    }
+
     Column {
         id: sensorReadingsLeftCol
         objectName: "sensorReadingsLeftCol"
         anchors.left: motorControlPanel.right
-        anchors.leftMargin: Constants.component_margin
+        anchors.leftMargin: Constants.screen_margin
         anchors.bottom: parent.bottom
         anchors.bottomMargin: Constants.screen_margin
-        width: Constants.default_panel_width
-        spacing: 60
+        width: Constants.default_measurement_panel_wdith
+        spacing: Constants.component_margin
 
-        SensorReading {
+        SensorReadingV2 {
             objectName: "actualForce"
             anchors.horizontalCenter: parent.horizontalCenter
             sensor_heading: "Actual Force, N"
             sensor_reading: "0"
+            exclusiveGroup: graphDisplayButtonGroup
         }
 
-        SensorReading {
+        SensorReadingV2 {
             objectName: "velOfSound"
             anchors.horizontalCenter: parent.horizontalCenter
-            sensor_heading: "Velocity of Sound, m/sec"
+            sensor_heading: "Velocity of Sound,\nm/sec"
             sensor_reading: "0"
+            exclusiveGroup: graphDisplayButtonGroup
         }
 
-        SensorReading {
+        SensorReadingV2 {
             objectName: "impedance"
             anchors.horizontalCenter: parent.horizontalCenter
             sensor_heading: "Impedance,\nmagnitude/frequency"
             sensor_reading: "0"
+            exclusiveGroup: graphDisplayButtonGroup
+        }
+        Rectangle {
+            id: spacer
+            height: 10
+            width: parent.width
+            opacity: 0
         }
     }
 
     Column {
         id: sensorReadingsRightCol
         objectName: "sensorReadingsRightCol"
-        width: Constants.default_panel_width
+        width: Constants.default_measurement_panel_wdith
         anchors.left: sensorReadingsLeftCol.right
         anchors.leftMargin: Constants.component_margin
         anchors.top: sensorReadingsLeftCol.top
         anchors.topMargin: 0
-        spacing: 60
+        spacing: Constants.component_margin
 
-        SensorReading {
+        SensorReadingV2 {
             objectName: "temperature"
             anchors.horizontalCenter: parent.horizontalCenter
             sensor_heading: "Temperature, C"
             sensor_reading: "0"
+            exclusiveGroup: graphDisplayButtonGroup
         }
 
-        SensorReading {
+        SensorReadingV2 {
+            checked: true
             objectName: "oxygen"
             anchors.horizontalCenter: parent.horizontalCenter
             sensor_heading: "Oxygen Level, %"
             sensor_reading: "0"
+            exclusiveGroup: graphDisplayButtonGroup
         }
     }
 
@@ -166,7 +191,10 @@ Rectangle {
         anchors.left: parent.left
         anchors.leftMargin: Constants.screen_margin
 
-        width: measurementPanel.width + Constants.component_margin + motorControlPanel.width
+        width: measurementPanel.width +
+               Constants.component_margin +
+               motorControlPanel.width -
+               runAllSensorsButtonShadow.shadow_offset
         height: sensorReadingsLeftCol.height - measurementPanel.height
         button_corner_radius: height / 2
 

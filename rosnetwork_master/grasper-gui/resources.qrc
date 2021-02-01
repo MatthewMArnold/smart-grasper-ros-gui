@@ -12,6 +12,7 @@
         <file>qml/MeasurementPanel.qml</file>
         <file>qml/MotorControlPanel.qml</file>
         <file>qml/SensorReading.qml</file>
+        <file>qml/SensorReadingV2.qml</file>
         <file>qml/images/warning.png</file>
     </qresource>
 </RCC>

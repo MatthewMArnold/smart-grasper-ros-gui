@@ -2,6 +2,7 @@
 #define THERMISTOR_WORKER_HPP
 
 #include <QApplication>
+#include <QMutex>
 #include <QObject>
 #include <QQmlApplicationEngine>
 #include <QString>
@@ -23,16 +24,20 @@ public:
 
 public slots:
     void setTemperature(double temperature, double time);
-    void setMeasureTemperature(bool measureTemperature);
+    void setMeasureTemperature(bool measureTemperature, int index);
+    void graphTemperature(bool);
 
 signals:
     void temperatureChanged(QString temperature);
-    void onMeasureTemperatureChanged(bool measureTemperature);
+    void onMeasureTemperatureChanged(bool measureTemperature, int index);
+    void temperatureChangedWithTime(double, double);
 
 private:
     double m_temperature;
     bool m_measureTemperature;
     ros::Subscriber m_thermistorMsgSubscriber;
+    QMutex m_graphControlLock;
+    bool m_graphControl = false;
 
     void run() override;
 };

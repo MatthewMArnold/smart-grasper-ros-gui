@@ -73,18 +73,20 @@ public:
     }
 
 public slots:
-    void setEnablePulseOx(bool enabled);
-    void setEnableTemperature(bool enabled);
-    void setEnableVelocityOfSound(bool enabled);
-    void setEnableImpedance(bool enabled);
+    void setEnablePulseOx(bool enabled, int index);
+    void setEnableTemperature(bool enabled, int index);
+    void setEnableVelocityOfSound(bool enabled, int index);
+    void setEnableImpedance(bool enabled, int index);
     void setTeensyConnected(bool teensyConnected);
     void teensyDisconnected();
     void setSerialNodeRunning(bool serialNodeRunning);
     void serialNodeDisconnected();
+    void graphMediator(double, double, bool);
 
 signals:
     void teensyConnectedMsgReceived();
     void serialNodeRunningMsgReceived();
+    void graphData(double, double);
 
 private:
     static constexpr int TEENSY_TIMEOUT_MS = 1000;
