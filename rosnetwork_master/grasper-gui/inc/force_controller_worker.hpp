@@ -32,13 +32,14 @@ public slots:
     void setForceDesired(double force);
     void setForceActual(double force);
     void setSqueeze(bool squeeze);
-    void setMeasureForceRequest(bool measureForceRequest);
+    void setMeasureForceRequest(bool measureForceRequest, int index);
+    void graphForce(bool);
 
 signals:
     void onForceDesiredChanged(double force);
     void onForceActualChanged(QString force);
     void onSqueezeChanged(bool squeeze);
-    void onMeasureForceRequestChanged(QVariant measureForceRequest);
+    void onForceActualChangedWithTime(double, double);
 
 private:
     double m_forceDesired = 0.0f;
@@ -48,6 +49,9 @@ private:
     ros::Publisher m_motorRequestPub;
     QMutex m_requestMutex;
     ros::Subscriber m_motorMsgSubscriber;
+
+    QMutex m_graphControlLock;
+    bool m_graphControl = false;
 
     void run() override;
 

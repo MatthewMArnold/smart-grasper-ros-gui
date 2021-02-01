@@ -5,13 +5,15 @@ QtObject {
     readonly property int total_screen_width: main_screen_width + side_bar_width
     readonly property int total_screen_height: main_screen_height
 
-    readonly property int main_screen_width: 1048
+    readonly property int main_screen_width: 1100
     readonly property int main_screen_height: 850
 
     readonly property int side_bar_width: 250
     readonly property int side_bar_button_height: 100
 
-    readonly property int default_panel_width: 240
+    readonly property int default_panel_width: 300
+    readonly property int default_motor_control_panel_width: 220
+    readonly property int default_measurement_panel_wdith: 240
     readonly property int default_small_text_rect_height: 50
     readonly property int measurement_reading_box_width: 100
 

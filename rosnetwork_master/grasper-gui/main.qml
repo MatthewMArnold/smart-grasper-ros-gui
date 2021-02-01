@@ -1,5 +1,6 @@
 import QtQuick 2.9
-import QtQuick.Controls 2.2
+import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
 import Ros 1.0
 import CustomPlot 1.0
 import ImageDisplayer 1.0
@@ -77,6 +78,32 @@ ApplicationWindow {
         id: sandboxScreen
         width: Constants.main_screen_width
         height: parent.height
+//        SensorReadingV2 {
+//            id: test
+//            anchors.left:parent.left
+//            anchors.top:parent.top
+//            width: 240
+//            sensor_heading: "pulse ox"
+//        }
+
+        RadioButton {
+            text: "Radio Button"
+            style: RadioButtonStyle {
+                indicator: Rectangle {
+                        implicitWidth: 100
+                        implicitHeight: 40
+                        border.color: control.activeFocus ? "pink" : "green"
+                        border.width: 1
+                        Rectangle {
+                            anchors.fill: parent
+                            visible: control.checked
+                            color: "#555"
+                            radius: 9
+                            anchors.margins: 4
+                        }
+                }
+            }
+         }
     }
 
     HomeScreen {

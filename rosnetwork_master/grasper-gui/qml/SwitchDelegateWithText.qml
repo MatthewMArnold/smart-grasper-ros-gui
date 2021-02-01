@@ -5,19 +5,19 @@ import "qrc:/qml"
 Row {
     property string side_text: ""
     
-    signal sliderToggled(bool toggled)
+    signal sliderToggled(bool toggled, int index)
 
     function switchOff() {
         if (s.position !== 0) {
             s.toggle()
-            sliderToggled(false)
+            sliderToggled(false, i.currentIndex)
         }
     }
 
     function switchOn() {
         if (s.position === 0) {
             s.toggle()
-            sliderToggled(true)
+            sliderToggled(true, i.currentIndex)
         }
     }
 
@@ -42,9 +42,21 @@ Row {
 
     SwitchDelegate {
         id: s
+        anchors.verticalCenter: parent.verticalCenter
         onToggled: {
-            console.log("toggled, position=" + position)
-            sliderToggled(position !== 0)
+            sliderToggled(position !== 0, i.currentIndex)
+        }
+    }
+
+    ComboBox {
+        id: i
+        width: 60
+        anchors.verticalCenter: parent.verticalCenter
+        model: ["0", "1", "2", "3", "4"]
+        onCurrentIndexChanged: {
+            if (s.position !== 0) {
+                sliderToggled(true, currentIndex)
+            }
         }
     }
 }

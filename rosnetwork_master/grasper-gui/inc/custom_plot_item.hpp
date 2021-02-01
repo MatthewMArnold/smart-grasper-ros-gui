@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QtQuick/QQuickPaintedItem>
+#include <qcustomplot.h>
 
 class QCustomPlot;
 class QCPAbstractPlottable;
@@ -24,8 +25,8 @@ public:
     Q_INVOKABLE void initCustomPlot();
 
     void setTimeToDisplay(int time) { m_timeToDisplay = time; }
-    void setXAxisLabel(QString label) { m_xAxisLabel = label; }
-    void setYAxisLabel(QString label) { m_yAxisLabel = label; }
+    void setXAxisLabel(QString label);
+    void setYAxisLabel(QString label);
 
     int timeToDisplay() const { return m_timeToDisplay; }
     QString xAxisLabel() const { return m_xAxisLabel; }

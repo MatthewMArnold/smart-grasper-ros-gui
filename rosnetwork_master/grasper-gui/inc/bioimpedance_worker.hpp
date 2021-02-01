@@ -28,13 +28,18 @@ public:
 
 public slots:
     void setImpedance(double impedance, double time);
-    void setImpedanceRequested(bool impedanceRequested);
+    void setImpedanceRequested(bool impedanceRequested, int index);
+    void graphImpedance(bool);
 
 signals:
     void impedanceChanged(QString);
-    void onImpedanceRequestedChanged(bool impedanceRequested);
+    void onImpedanceRequestedChanged(bool impedanceRequested, int index);
+    void impedanceChangedWithTime(double, double);
 
 private:
+    QMutex m_graphControlLock;
+    bool m_graphControl = false;
+
     double m_impedance;
     bool m_impedanceRequested;
     ros::Subscriber m_impedanceMsgSubscriber;

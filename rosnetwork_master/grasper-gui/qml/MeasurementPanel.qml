@@ -69,9 +69,10 @@ Column {
 
     Rectangle {
         id: sensorControlPanel
+        objectName: "sensorControlPanel"
 
         width: parent.width
-        height: switchCol.height
+        height: switchCol.height + Constants.component_margin * 2
         color: Constants.subsection_background_color
         radius: Constants.default_large_edge_radius
 
@@ -153,41 +154,48 @@ Column {
 
         Column {
             id: switchCol
+            objectName: "switchCol"
             width: parent.width
+            anchors.verticalCenter: parent.verticalCenter
 
             SwitchDelegateWithText {
                 id: pulseOxSwitch
+                objectName: "pulseOxSwitch"
                 anchors.right: parent.right
+                anchors.rightMargin: Constants.component_margin
                 side_text: "Pulse Ox"
-                onSliderToggled: onPulseOxRequestChanged(toggled)  // TODO replace
             }
 
             SwitchDelegateWithText {
                 id: temperatureSwitch
+                objectName: "temperatureSwitch"
                 anchors.right: parent.right
+                anchors.rightMargin: Constants.component_margin
                 side_text: "Temperature"
-                onSliderToggled: onTemperatureRequestChanged(toggled)  // TODO replace
             }
 
             SwitchDelegateWithText {
                 id: forceMeasureSwitch
+                objectName: "forceMeasurementSwitch"
                 anchors.right: parent.right
+                anchors.rightMargin: Constants.component_margin
                 side_text: "Force"
-                onSliderToggled: onForceRequestChanged(toggled)  // TODO replace
             }
 
             SwitchDelegateWithText {
                 id: velOfSoundSwitch
+                objectName: "velOfSoundSwitch"
                 anchors.right: parent.right
+                anchors.rightMargin: Constants.component_margin
                 side_text: "Velocity of Sound"
-                onSliderToggled: onVelocityOfSoundRequestChanged(toggled)  // TODO replace
             }
 
             SwitchDelegateWithText {
                 id: impedanceSwitch
+                objectName: "impedanceSwitch"
                 anchors.right: parent.right
+                anchors.rightMargin: Constants.component_margin
                 side_text: "Impedance"
-                onSliderToggled: onImpedanceRequestChanged(toggled)  // TODO replace
             }
         }
     }

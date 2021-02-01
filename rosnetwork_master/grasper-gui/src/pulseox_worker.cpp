@@ -24,39 +24,52 @@ void PulseoxWorker::initPulseOxGraph() {}
 void PulseoxWorker::addConnections(QObject *root)
 {
     ValueUpdater *pulseoxMeasurement = qobject_cast<ValueUpdater *>(
-        MainController::getInstance()
-            ->getRoot()
-            ->findChild<QObject *>("homeScreen")
+        root->findChild<QObject *>("homeScreen")
             ->findChild<QObject *>("sensorReadingsRightCol")
             ->findChild<QObject *>("oxygen")
             ->findChild<QObject *>("displayBorder")
             ->findChild<QObject *>("sensorReading"));
-
-    if (pulseoxMeasurement)
-    {
-        QObject::connect(
-            this,
-            SIGNAL(oxygenLevelChanged(QString)),
-            pulseoxMeasurement,
-            SLOT(setValue(QString)),
-            Qt::QueuedConnection);
-    }
-    else
-    {
-        qDebug() << "failed to find pulse measurement value to update";
-    }
-
     QObject::connect(
-        root,
-        SIGNAL(onPulseOxRequestChanged(bool)),
         this,
-        SLOT(setMeasurePulseox(bool)),
+        SIGNAL(oxygenLevelChanged(QString)),
+        pulseoxMeasurement,
+        SLOT(setValue(QString)),
+        Qt::QueuedConnection);
+
+    QObject *pulseoxRadio = root->findChild<QObject *>("homeScreen")
+                                ->findChild<QObject *>("sensorReadingsRightCol")
+                                ->findChild<QObject *>("oxygen");
+    QObject::connect(
+        pulseoxRadio,
+        SIGNAL(onSelected(bool)),
+        this,
+        SLOT(graphPulseox(bool)),
         Qt::DirectConnection);
+
+    CustomPlotItem *graph = qobject_cast<CustomPlotItem *>(
+        MainController::getInstance()->getRoot()->findChild<QObject *>(
+            "pulsePlot"));
     QObject::connect(
         this,
-        SIGNAL(onMeasurePulseoxChanged(bool)),
+        SIGNAL(oxygenLevelChangedWithTime(double, double)),
+        graph,
+        SLOT(graphData(double, double)),
+        Qt::DirectConnection);
+
+    QObject *pulseoxSwitch = root->findChild<QObject *>("pulseOxSwitch");
+    QObject::connect(
+        pulseoxSwitch,
+        SIGNAL(sliderToggled(bool, int)),
+        this,
+        SLOT(setMeasurePulseox(bool, int)),
+        Qt::DirectConnection);
+
+    QObject::connect(
+        this,
+        SIGNAL(onMeasurePulseoxChanged(bool, int)),
         MainController::getInstance(),
-        SLOT(setEnablePulseOx(bool)));
+        SLOT(setEnablePulseOx(bool, int)));
+
     m_pulseoxMsgSubscriber =
         MainController::getInstance()->getNodeHandle()->subscribe(
             "serial/pulseOxData",
@@ -72,19 +85,37 @@ void PulseoxWorker::setOxygenLevel(double oxygenLevel, double time)
         m_oxygenLevel = oxygenLevel;
         if (m_measurePulseox)
         {
-            emit oxygenLevelChangedWithTime(m_oxygenLevel, time);
             emit oxygenLevelChanged(QString::number(m_oxygenLevel, 'g', 2));
+            QMutexLocker lock(&m_graphControlLock);
+            if (m_graphControl)
+            {
+                emit oxygenLevelChangedWithTime(m_oxygenLevel, time);
+            }
         }
     }
 }
 
-void PulseoxWorker::setMeasurePulseox(bool measurePulseox)
+void PulseoxWorker::graphPulseox(bool selected)
 {
-    if (m_measurePulseox != measurePulseox)
+    if (selected)
     {
-        m_measurePulseox = measurePulseox;
-        emit onMeasurePulseoxChanged(m_measurePulseox);
+        CustomPlotItem *graph = qobject_cast<CustomPlotItem *>(
+            MainController::getInstance()
+                ->getRoot()
+                ->findChild<QObject *>("homeScreen")
+                ->findChild<QObject *>("pulsePlot"));
+        graph->setYAxisLabel("Oxygen level (SpO2%)");
+        graph->initCustomPlot();
     }
+    QMutexLocker lock(&m_graphControlLock);
+    m_graphControl = selected;
+}
+
+void PulseoxWorker::setMeasurePulseox(bool measurePulseox, int index)
+{
+    m_measurePulseox = measurePulseox;
+    qDebug() << "onmeasurepulseox " << index;
+    emit onMeasurePulseoxChanged(m_measurePulseox, index);
 }
 
 void PulseoxWorker::run()

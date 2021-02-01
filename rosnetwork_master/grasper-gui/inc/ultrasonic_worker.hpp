@@ -2,6 +2,7 @@
 #define ULTRASONIC_WORKER_HPP
 
 #include <QApplication>
+#include <QMutex>
 #include <QObject>
 #include <QQmlApplicationEngine>
 #include <QString>
@@ -23,16 +24,22 @@ public:
 
 public slots:
     void setVelocityOfSound(double velocityOfSound, double time);
-    void setMeasureVelocityOfSound(bool measureVelocityOfSound);
+    void setMeasureVelocityOfSound(bool measureVelocityOfSound, int index);
+    void graphVelOfSound(bool);
 
 signals:
     void onVelocityOfSoundChanged(QString velocityOfSound);
-    void onMeasureVelocityOfSoundChanged(bool measureVelocityOfSound);
+    void onMeasureVelocityOfSoundChanged(
+        bool measureVelocityOfSound,
+        int index);
+    void onVelocityOfSoundChangedWithTime(double, double);
 
 private:
     double m_velocityOfSound;
     bool m_measureVelocityOfSound;
     ros::Subscriber m_ultrasonicMsgSubscriber;
+    QMutex m_graphControlLock;
+    bool m_graphControl = false;
 
     void run() override;
 };

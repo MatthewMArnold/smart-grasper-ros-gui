@@ -35,8 +35,18 @@ class SerialNode:
         self.socket.sendMessage(data, MOTOR_REQUEST_TX_TYPE)
 
     def sendSensorEnableRequest(self, msg):
-        data = struct.pack("????", msg.enablePulseOx, msg.enableTemperature, msg.enableVelocityOfSound, msg.enableImpedance)
-        self.socket.sendMessage(data, )
+        data = struct.pack(
+            "????cccc",
+            msg.enablePulseOx,
+            msg.enableTemperature,
+            msg.enableVelocityOfSound,
+            msg.enableImpedance,
+            msg.pulseoxIndex,
+            msg.temperatureIndex,
+            msg.velocityOfSoundIndex,
+            msg.impedanceIndex)
+
+        self.socket.sendMessage(data, SENSOR_ENABLE_TX_TYPE)
 
 if __name__ == '__main__':
     SerialNode()
