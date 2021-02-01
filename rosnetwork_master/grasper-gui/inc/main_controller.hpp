@@ -11,12 +11,9 @@
 #include <std_msgs/Bool.h>
 
 #include "error_reporter.hpp"
+#include "sensor_measurement_instances.hpp"
 
 class ForceControllerWorker;
-class ThermistorWorker;
-class PulseoxWorker;
-class UltrasonicWorker;
-class BioimpedanceWorker;
 
 /**
  * Thread that publishes sensor requests to '/serial/sensorEnable'
@@ -35,8 +32,7 @@ class SensorRequestWorker : public QThread
 class MainController : public QObject, public ErrorReporter
 {
     Q_OBJECT
-    Q_PROPERTY(
-        bool teensyConnected READ teensyConnected WRITE setTeensyConnected)
+    Q_PROPERTY(bool teensyConnected READ teensyConnected WRITE setTeensyConnected)
 
 public:
     static inline MainController *getInstance()
@@ -67,10 +63,7 @@ public:
 
     void serialNodeConnectedMsgCallback(const std_msgs::Bool &msg);
 
-    void errorCleared(ErrorController::ErrorType type) override
-    {
-        Q_UNUSED(type);
-    }
+    void errorCleared(ErrorController::ErrorType type) override { Q_UNUSED(type); }
 
 public slots:
     void setEnablePulseOx(bool enabled, int index);
@@ -96,18 +89,14 @@ private:
 
     // Thread workers
     ForceControllerWorker *forceController;
-    ThermistorWorker *thermistor;
-    PulseoxWorker *pulseox;
-    UltrasonicWorker *ultrasonic;
-    BioimpedanceWorker *bioimpedance;
+    ThermistorMeasurement *thermistor;
+    PulseoxMeasurement *pulseox;
+    UltrasonicMeasurement *ultrasonic;
+    ImpedanceMeasurement *bioimpedance;
     SensorRequestWorker *sensorRequest;
 
     // Threads
     QThread forceControllerThread;
-    QThread thermistorThread;
-    QThread pulseoxThread;
-    QThread ultrasonicThread;
-    QThread bioimpedanceThread;
     QThread sendSensorRequestThread;
 
     grasper_msg::SensorRequestMessage m_sensorRequestMessage;

@@ -69,11 +69,7 @@ void ErrorController::initialize()
 
 void ErrorController::addError(ErrorReporter *callingClass, ErrorType error)
 {
-    if (attemptToAddError(
-            error,
-            callingClass,
-            m_criticalErrorToPriorityMap,
-            m_criticalErrorQueue))
+    if (attemptToAddError(error, callingClass, m_criticalErrorToPriorityMap, m_criticalErrorQueue))
     {
         displayCriticalError();
     }
@@ -89,18 +85,12 @@ void ErrorController::addError(ErrorReporter *callingClass, ErrorType error)
 
 void ErrorController::removeError(ErrorType error)
 {
-    if (attemptToRemoveError(
-            error,
-            m_criticalErrorToPriorityMap,
-            m_criticalErrorQueue))
+    if (attemptToRemoveError(error, m_criticalErrorToPriorityMap, m_criticalErrorQueue))
     {
         emit hideCriticalErrorDialogue();
         displayCriticalError();
     }
-    else if (attemptToRemoveError(
-                 error,
-                 m_nonCriticalErrorToPriorityMap,
-                 m_nonCriticalErrorQueue))
+    else if (attemptToRemoveError(error, m_nonCriticalErrorToPriorityMap, m_nonCriticalErrorQueue))
     {
         emit hideNonurgentErrorDialogue();
         displayNoncriticalError();

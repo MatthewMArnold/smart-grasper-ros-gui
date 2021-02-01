@@ -165,6 +165,14 @@ Rectangle {
         spacing: Constants.component_margin
 
         SensorReadingV2 {
+            objectName: "jawPosition"
+            anchors.horizontalCenter: parent.horizontalCenter
+            sensor_heading: "Jaw Position, mm"
+            sensor_reading: "0"
+            exclusiveGroup: graphDisplayButtonGroup
+        }
+
+        SensorReadingV2 {
             objectName: "temperature"
             anchors.horizontalCenter: parent.horizontalCenter
             sensor_heading: "Temperature, C"

@@ -30,6 +30,7 @@ class MotorInfoHandler:
     def __call__(self, msg):
         try:
             data = struct.unpack("<ff", msg)
+            time = struct.unpack("<L", msg[2])
         except struct.error as e:
             rospy.logerr("invalid motor info message")
             return
@@ -37,6 +38,7 @@ class MotorInfoHandler:
         feedback = MotorMessageFeedback()
         feedback.jawPos = data[0]
         feedback.appliedForce = data[1]
+        feedback.time = time[0]
 
         self.pub.publish(feedback)
 

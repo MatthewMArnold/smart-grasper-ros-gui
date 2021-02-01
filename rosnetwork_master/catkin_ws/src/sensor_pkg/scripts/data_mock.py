@@ -29,6 +29,7 @@ def pulse_ox_talker():
         force_msg = MotorMessageFeedback()
         force_msg.appliedForce = float(random.randrange(0, 100)) / 10.0
         force_msg.jawPos = float(random.randrange(0, 100)) / 10.0
+        force_msg.time = j
         mcu_msg = Bool()
         mcu_msg.data = True
         serial_running_msg = Bool()

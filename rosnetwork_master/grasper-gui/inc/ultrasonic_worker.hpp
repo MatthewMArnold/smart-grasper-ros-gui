@@ -29,9 +29,7 @@ public slots:
 
 signals:
     void onVelocityOfSoundChanged(QString velocityOfSound);
-    void onMeasureVelocityOfSoundChanged(
-        bool measureVelocityOfSound,
-        int index);
+    void onMeasureVelocityOfSoundChanged(bool measureVelocityOfSound, int index);
     void onVelocityOfSoundChangedWithTime(double, double);
 
 private:
