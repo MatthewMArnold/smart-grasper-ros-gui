@@ -17,7 +17,7 @@ def pulse_ox_talker():
     force_pub = rospy.Publisher('serial/motorFeedback', MotorMessageFeedback, queue_size=1)
     j = 0
     while not rospy.is_shutdown():
-        pulseox_num = math.sin(j * 1)
+        pulseox_num = 50 * math.sin(j * 1) + 50
         thermistor_num = 40.0 * float(random.randrange(0, 100)) / 100.0
         ultrasonic_num = float(random.randrange(0, 100)) / 100.0
         impedance_num = float(random.randrange(0, 100)) / 100.0
