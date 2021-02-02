@@ -288,7 +288,7 @@ Rectangle {
         Text {
             anchors.centerIn: parent
             color: Constants.primary_font_color
-            text: "Pulse"
+            text: ""
             font.weight: Font.ExtraBold
             horizontalAlignment: Text.AlignHCenter
             font.pixelSize: 20

@@ -1,0 +1,9 @@
+build-grasper-gui-Desktop-Release
+build-grasper-gui-Desktop-Debug
+build-grasper-gui-Desktop-Profile
+:main.qmlc
+rosnetwork_master/catkin_ws/build
+rosnetwork_master/catkin_ws/devel
+rosnetwork_slave/catkin_ws/build
+rosnetwork_slave/catkin_ws/devel
+*.pyc

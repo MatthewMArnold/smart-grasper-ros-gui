@@ -18,16 +18,9 @@ ApplicationWindow {
     maximumWidth: Constants.total_screen_width
     minimumWidth: Constants.total_screen_width
 
-    // motor control panel signals
+    // motor control panel signals, TODO these should be removed
     signal onDesiredForceChanged(double force)
     signal onMotorClosedRequested(bool closeMotor)
-
-    // sensor control panel signals
-    signal onPulseOxRequestChanged(bool pulseOxRequested)
-    signal onTemperatureRequestChanged(bool temperatureRequested)
-    signal onForceRequestChanged(bool forceRequested)
-    signal onVelocityOfSoundRequestChanged(bool velocityOfSoundRequested)
-    signal onImpedanceRequestChanged(bool impedanceRequested)
 
     Sidebar {
         id: sidebar
@@ -74,36 +67,13 @@ ApplicationWindow {
         signal criticalErrorOKPressed()
     }
 
+    /*
+     * This is for me to mess around with new stuff in.
+     */
     Rectangle {
         id: sandboxScreen
         width: Constants.main_screen_width
         height: parent.height
-//        SensorReadingV2 {
-//            id: test
-//            anchors.left:parent.left
-//            anchors.top:parent.top
-//            width: 240
-//            sensor_heading: "pulse ox"
-//        }
-
-        RadioButton {
-            text: "Radio Button"
-            style: RadioButtonStyle {
-                indicator: Rectangle {
-                        implicitWidth: 100
-                        implicitHeight: 40
-                        border.color: control.activeFocus ? "pink" : "green"
-                        border.width: 1
-                        Rectangle {
-                            anchors.fill: parent
-                            visible: control.checked
-                            color: "#555"
-                            radius: 9
-                            anchors.margins: 4
-                        }
-                }
-            }
-         }
     }
 
     HomeScreen {
