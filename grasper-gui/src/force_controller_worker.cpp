@@ -38,12 +38,15 @@ void ForceControllerWorker::setForceActual(double force, double time)
         m_forceActual = force;
         if (m_measureForceRequest)
         {
-            emit onForceActualChanged(QString::number(m_forceActual, 'g', 2));
-            QMutexLocker lock(&m_graphControlLock);
-            if (m_forceGraphControl)
-            {
-                onForceActualChangedWithTime(m_forceActual, time);
-            }
+            emit onForceActualChanged(limitedNum(m_forceActual));
+        }
+    }
+    if (m_measureForceRequest)
+    {
+        QMutexLocker lock(&m_graphControlLock);
+        if (m_forceGraphControl)
+        {
+            onForceActualChangedWithTime(m_forceActual, time);
         }
     }
 }
@@ -137,15 +140,15 @@ void ForceControllerWorker::addConnections(QObject *root)
         SLOT(setMeasureForceRequest(bool, int)),
         Qt::DirectConnection);
 
+    QObject *motorControlPanel = root->findChild<QObject *>("motorControlPanel");
     QObject::connect(
-        root,
+        motorControlPanel,
         SIGNAL(onDesiredForceChanged(double)),
         this,
         SLOT(setForceDesired(double)),
         Qt::DirectConnection);
-
     QObject::connect(
-        root,
+        motorControlPanel,
         SIGNAL(onMotorClosedRequested(bool)),
         this,
         SLOT(setSqueeze(bool)),
@@ -185,7 +188,7 @@ void ForceControllerWorker::graphForce(bool selected)
                                                ->getRoot()
                                                ->findChild<QObject *>("homeScreen")
                                                ->findChild<QObject *>("pulsePlot"));
-        graph->setYAxisLabel("Force, N");
+        graph->setYAxisLabel("Force (N)");
         graph->initCustomPlot();
     }
     QMutexLocker lock(&m_graphControlLock);
@@ -201,7 +204,7 @@ void ForceControllerWorker::graphPosition(bool selected)
                                                ->getRoot()
                                                ->findChild<QObject *>("homeScreen")
                                                ->findChild<QObject *>("pulsePlot"));
-        graph->setYAxisLabel("Position, mm");
+        graph->setYAxisLabel("Position (mm)");
         graph->initCustomPlot();
     }
     QMutexLocker lock(&m_graphControlLock);
@@ -215,11 +218,11 @@ void ForceControllerWorker::setPositionActual(double position, double time)
         m_positionActual = position;
         if (m_measureForceRequest)
         {
-            emit onPositionActualChanged(QString::number(m_positionActual, 'g', 2));
+            emit onPositionActualChanged(limitedNum(m_positionActual));
         }
     }
     QMutexLocker lock(&m_graphControlLock);
-    if (m_positionGraphControl)
+    if (m_measureForceRequest && m_positionGraphControl)
     {
         emit onPositionActualChangedWithTime(m_positionActual, time);
     }

@@ -6,9 +6,6 @@
 #include "custom_plot_item.hpp"
 #include "error_controller.hpp"
 #include "force_controller_worker.hpp"
-#include "pulseox_worker.hpp"
-#include "thermistor_worker.hpp"
-#include "ultrasonic_worker.hpp"
 
 void SensorRequestWorker::run()
 {

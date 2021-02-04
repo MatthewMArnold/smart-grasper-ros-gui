@@ -60,36 +60,29 @@ grasper's microcontroller(s) as well as the grasper's camera.
 
 ### Setting up communication between RPi and Laptop
 
-See the [RPi's readme for
-instructions](../../rosnetwork_master/catkin_ws/README.md#Setting-up-communication-between-RPi-and-Laptop)
-to configure the laptop's network settings correctly.
-
-### Setting up communication between RPi and Laptop
-
-The RPi is the ROS master. To configure the network properly, you first must set
-up a static IP address for the RPi (see
+The laptop is the ROS master. To configure the network properly, you first must
+set up a static IP address for the laptop and RPi (see
 [here](https://computingforgeeks.com/how-to-configure-static-ip-address-on-ubuntu/)
-if you are unfamiliar with setting this up). You must do this for both the RPi
-and the laptop.
+if you are unfamiliar with setting this up).
 
 Next disable the firewall on the RPi and laptop (`sudo ufw disable`). To see if
 you can communicate with the RPi and laptop, ping both devices.
 
-On the RPi, open `~/.bashrc` and add the following:
+On the laptop, open `~/.bashrc` and add the following:
 ```bash
 export ROS_MASTER_URI=http://localhost:11311/
-export ROS_HOSTNAME=$RPI_IP_ADDR
-export ROS_IP=$RPI_IP_ADDR
+export ROS_HOSTNAME=$LAPTOP_IP_ADDR
+export ROS_IP=$LAPTOP_IP_ADDR
 ```
-where RPI_IP_ADDR is the static ip address of the RPi you configured earlier.
+where `LAPTOP_IP_ADDR` is the static ip address of the laptop you configured earlier.
 
-Now, on the laptop, open `~/.bashrc` and add the following:
+Now, on the RPi, open `~/.bashrc` and add the following:
 ```bash
 export ROS_MASTER_URI=http://$LAPTOP_IP_ADDR:11311/
-export ROS_HOSTNAME=$RPI_IP_ADDR
-export ROS_IP=$RPI_IP_ADDR
+export ROS_HOSTNAME=$LAPTOP_IP_ADDR
+export ROS_IP=$LAPTOP_IP_ADDR
 ```
-where LAPTOP_IP_ADDR is the static ip address of the laptop you configured
+where `LAPTOP_IP_ADDR` is the static ip address of the laptop you configured
 earlier. Note that the only thing different from the RPi is the first line.
 
 ### Synchronizing RPi's slock with laptop
@@ -172,11 +165,11 @@ that of the message.
 - Add the file to the `add_message_files` section in
   `rosnetwork_master/catkin_ws/src/grasper_msg/CMakeLists.txt`.
 - If you want this message to be used to receive data from the teensy, in
-  `rosnetwork_master/catkin_ws/src/serial_pkg/src/serial_handlers.py`, make a
+  `rosnetwork_slave/catkin_ws/src/serial_pkg/src/serial_handlers.py`, make a
   new handler class with `__init__` and `__call__` functions. In the
   `receiveHandlers` dict, add the handler id mapped to the handler class.
 - If you want to send data from the teensy, in
-  `rosnetwork_master/catkin_ws/src/serial_pkg/src/serial_node.py`, add a new
+  `rosnetwork_slave/catkin_ws/src/serial_pkg/src/serial_node.py`, add a new
   subscriber. Pass in the custom message you defined as well as a function you
   define in the SerialNode class below `__init__`.
 - Run `catkin_make` in `rosnetwork_master/catkin_ws` and
@@ -186,7 +179,7 @@ that of the message.
 Alternatively, if instead of creating an RX callback you want to send a ROS
 message across the serial node, assuming you have created a message do the
 following:
-- In `rosnetwork_master/catkin_ws/src/serial_pkg/src/serial_node.py`, add a
+- In `rosnetwork_slave/catkin_ws/src/serial_pkg/src/serial_node.py`, add a
   function that receives a ROS message and packages it into an array of bytes
   (use `struct.pack` for simplicity).
 - In the same file, add a subscriber in the `SerialNode`'s `__init__` function.

@@ -8,6 +8,11 @@
 
 #include "sensor_measurement.hpp"
 
+/**
+ * Provides a QString with the number limited to n decimal points
+ */
+QString limitedNum(double num, int n = 2);
+
 class ImpedanceMeasurement : public SensorMeasurement
 {
 public:

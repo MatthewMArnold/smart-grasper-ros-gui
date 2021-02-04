@@ -62,11 +62,15 @@ def crc8(data, crc=0xff):
     return csum
 
 def crc16(data, crc=0xffff):
-    """Calculate CRC16 using the given table.
-    `data`      - data for calculating CRC, must be a string
-    `crc`       - initial value
-    `table`     - table for caclulating CRC (list of 256 integers)
-    Return calculated value of CRC
+    """
+    Calculate CRC16 using the given table.
+
+    Args:
+        - data (string): data for calculating CRC
+        - crc(int): - initial value
+        - table(length 256 integer list): table for caclulating CRC
+    Returns:
+        integer: calculated value of CRC
     """
     if isinstance(data, unicode):
         data = data.encode()

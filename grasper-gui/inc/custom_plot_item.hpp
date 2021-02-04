@@ -7,7 +7,6 @@
 
 class QCustomPlot;
 class QCPAbstractPlottable;
-class PulseoxWorker;
 
 class CustomPlotItem : public QQuickPaintedItem
 {
