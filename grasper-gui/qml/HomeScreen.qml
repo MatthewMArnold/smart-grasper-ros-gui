@@ -97,6 +97,7 @@ Rectangle {
 
     MotorControlPanel {
         id: motorControlPanel
+        objectName: "motorControlPanel"
 
         onMotorControllerTurnedOn: {
             measurementPanel.forceSwitchOn()
@@ -126,7 +127,7 @@ Rectangle {
         SensorReadingV2 {
             objectName: "actualForce"
             anchors.horizontalCenter: parent.horizontalCenter
-            sensor_heading: "Actual Force, N"
+            sensor_heading: "Actual Force (N)"
             sensor_reading: "0"
             exclusiveGroup: graphDisplayButtonGroup
         }
@@ -134,7 +135,7 @@ Rectangle {
         SensorReadingV2 {
             objectName: "velOfSound"
             anchors.horizontalCenter: parent.horizontalCenter
-            sensor_heading: "Velocity of Sound,\nm/sec"
+            sensor_heading: "Velocity of Sound\n(m/sec)"
             sensor_reading: "0"
             exclusiveGroup: graphDisplayButtonGroup
         }
@@ -142,7 +143,7 @@ Rectangle {
         SensorReadingV2 {
             objectName: "impedance"
             anchors.horizontalCenter: parent.horizontalCenter
-            sensor_heading: "Impedance,\nmagnitude/frequency"
+            sensor_heading: "Impedance\n(todo)"
             sensor_reading: "0"
             exclusiveGroup: graphDisplayButtonGroup
         }
@@ -167,7 +168,7 @@ Rectangle {
         SensorReadingV2 {
             objectName: "jawPosition"
             anchors.horizontalCenter: parent.horizontalCenter
-            sensor_heading: "Jaw Position, mm"
+            sensor_heading: "Jaw Position (mm)"
             sensor_reading: "0"
             exclusiveGroup: graphDisplayButtonGroup
         }
@@ -175,7 +176,7 @@ Rectangle {
         SensorReadingV2 {
             objectName: "temperature"
             anchors.horizontalCenter: parent.horizontalCenter
-            sensor_heading: "Temperature, C"
+            sensor_heading: "Temperature (C)"
             sensor_reading: "0"
             exclusiveGroup: graphDisplayButtonGroup
         }
@@ -184,7 +185,7 @@ Rectangle {
             checked: true
             objectName: "oxygen"
             anchors.horizontalCenter: parent.horizontalCenter
-            sensor_heading: "Oxygen Level, %"
+            sensor_heading: "Oxygen Level (%)"
             sensor_reading: "0"
             exclusiveGroup: graphDisplayButtonGroup
         }

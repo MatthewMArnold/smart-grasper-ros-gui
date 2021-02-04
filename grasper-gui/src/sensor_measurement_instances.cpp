@@ -1,8 +1,22 @@
 #include "sensor_measurement_instances.hpp"
 
 #include <QDebug>
+#include <cmath>
 
 #include "main_controller.hpp"
+
+QString limitedNum(double num, int n)
+{
+    int i = rint(num * pow(10, n));
+    if (i % 100)
+    {
+        return QString::number(num, 'f', i % 10 ? 2 : 1);
+    }
+    else
+    {
+        return QString::number(i / 100);
+    }
+}
 
 ImpedanceMeasurement::ImpedanceMeasurement() : SensorMeasurement("impedance")
 {
@@ -27,17 +41,20 @@ void ImpedanceMeasurement::msgCallback(const grasper_msg::ImpedanceDataMessage &
         m_currAvgValue = avgX;
         if (this->getMeasurementRequested())
         {
-            emit onMeasurementChanged(QString::number(m_currAvgValue, 'g', 2));
-            bool gc = this->getGraphControl();
-            if (gc)
-            {
-                emit onMeasurementChangedWithTime(m_currAvgValue, msg.dataPoint[MSG_LEN - 1].time);
-            }
+            emit onMeasurementChanged(limitedNum(m_currAvgValue));
+        }
+    }
+    if (this->getMeasurementRequested())
+    {
+        bool gc = this->getGraphControl();
+        if (gc)
+        {
+            emit onMeasurementChangedWithTime(m_currAvgValue, msg.dataPoint[MSG_LEN - 1].time);
         }
     }
 }
 
-PulseoxMeasurement::PulseoxMeasurement() : SensorMeasurement("Oxygen Level, %", true)
+PulseoxMeasurement::PulseoxMeasurement() : SensorMeasurement("Oxygen Level (%)", true)
 {
     m_measurementSubscriber = MainController::getInstance()->getNodeHandle()->subscribe(
         "serial/pulseOxData",
@@ -60,17 +77,20 @@ void PulseoxMeasurement::msgCallback(const grasper_msg::PulseOxRxMessage &msg)
         m_currAvgValue = avgX;
         if (this->getMeasurementRequested())
         {
-            emit onMeasurementChanged(QString::number(m_currAvgValue, 'g', 2));
-            bool gc = this->getGraphControl();
-            if (gc)
-            {
-                emit onMeasurementChangedWithTime(m_currAvgValue, msg.dataPoint[MSG_LEN - 1].time);
-            }
+            emit onMeasurementChanged(limitedNum(m_currAvgValue));
+        }
+    }
+    if (this->getMeasurementRequested())
+    {
+        bool gc = this->getGraphControl();
+        if (gc)
+        {
+            emit onMeasurementChangedWithTime(m_currAvgValue, msg.dataPoint[MSG_LEN - 1].time);
         }
     }
 }
 
-UltrasonicMeasurement::UltrasonicMeasurement() : SensorMeasurement("Velocity of Sound, m/sec")
+UltrasonicMeasurement::UltrasonicMeasurement() : SensorMeasurement("Velocity of Sound (m/sec)")
 {
     m_measurementSubscriber = MainController::getInstance()->getNodeHandle()->subscribe(
         "serial/ultrasonicData",
@@ -93,17 +113,20 @@ void UltrasonicMeasurement::msgCallback(const grasper_msg::UltrasonicDataMessage
         m_currAvgValue = avgX;
         if (this->getMeasurementRequested())
         {
-            emit onMeasurementChanged(QString::number(m_currAvgValue, 'g', 2));
-            bool gc = this->getGraphControl();
-            if (gc)
-            {
-                emit onMeasurementChangedWithTime(m_currAvgValue, msg.dataPoint[MSG_LEN - 1].time);
-            }
+            emit onMeasurementChanged(limitedNum(m_currAvgValue));
+        }
+    }
+    if (this->getMeasurementRequested())
+    {
+        bool gc = this->getGraphControl();
+        if (gc)
+        {
+            emit onMeasurementChangedWithTime(m_currAvgValue, msg.dataPoint[MSG_LEN - 1].time);
         }
     }
 }
 
-ThermistorMeasurement::ThermistorMeasurement() : SensorMeasurement("Temperature, C")
+ThermistorMeasurement::ThermistorMeasurement() : SensorMeasurement("Temperature (C)")
 {
     m_measurementSubscriber = MainController::getInstance()->getNodeHandle()->subscribe(
         "serial/thermistorData",
@@ -126,12 +149,15 @@ void ThermistorMeasurement::msgCallback(const grasper_msg::ThermistorMessage &ms
         m_currAvgValue = avgX;
         if (this->getMeasurementRequested())
         {
-            emit onMeasurementChanged(QString::number(m_currAvgValue, 'g', 2));
-            bool gc = this->getGraphControl();
-            if (gc)
-            {
-                emit onMeasurementChangedWithTime(m_currAvgValue, msg.dataPoint[MSG_LEN - 1].time);
-            }
+            emit onMeasurementChanged(limitedNum(m_currAvgValue));
+        }
+    }
+    if (this->getMeasurementRequested())
+    {
+        bool gc = this->getGraphControl();
+        if (gc)
+        {
+            emit onMeasurementChangedWithTime(m_currAvgValue, msg.dataPoint[MSG_LEN - 1].time);
         }
     }
 }

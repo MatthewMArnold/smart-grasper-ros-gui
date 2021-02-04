@@ -4,7 +4,6 @@
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickPaintedItem>
 
-#include "pulseox_worker.hpp"
 #include "qcustomplot.h"
 
 CustomPlotItem::CustomPlotItem(QQuickItem* parent)
@@ -90,7 +89,7 @@ void CustomPlotItem::updateCustomPlotSize()
 
 void CustomPlotItem::onCustomReplot() { update(); }
 
-void CustomPlotItem::setupPulseoxData(QCustomPlot* customPlot)  //, PulseoxWorker *pulseox)
+void CustomPlotItem::setupPulseoxData(QCustomPlot* customPlot)
 {
     customPlot->addGraph();
     customPlot->xAxis->setLabel(m_xAxisLabel);

@@ -18,10 +18,6 @@ ApplicationWindow {
     maximumWidth: Constants.total_screen_width
     minimumWidth: Constants.total_screen_width
 
-    // motor control panel signals, TODO these should be removed
-    signal onDesiredForceChanged(double force)
-    signal onMotorClosedRequested(bool closeMotor)
-
     Sidebar {
         id: sidebar
         anchors.top: parent.top

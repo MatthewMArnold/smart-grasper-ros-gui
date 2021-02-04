@@ -10,6 +10,9 @@ Column {
     signal motorControllerTurnedOn
     signal motorControllerTurnedOff
 
+    signal onDesiredForceChanged(double force)
+    signal onMotorClosedRequested(bool closeMotor)
+
     function turnOnMotorController() {
         releaseButton.enabled = true
         closeButton.enabled = false
