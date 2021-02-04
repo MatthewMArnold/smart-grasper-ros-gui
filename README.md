@@ -3,8 +3,8 @@
 ## Overview
 
 This code is designed to run a rosnetwork on two devices, one of which is a
-Raspberry Pi 4 connected to a teensy, and the other of which is a laptop running
-a GUI and performing data acquisition.
+Raspberry Pi 4 connected to a microcontroller, and the other of which is a
+laptop running a GUI and performing data acquisition.
 
 ## ROS Master Setup
 
@@ -35,8 +35,8 @@ The laptop runs as the ROS master in this multi-device ROS network.
 
 ## ROS Slave Setup
 
-The teensy runs as the ROS slave. The teensy is configured to communicate with
-the grasper's embedded devices as well as the grasper's camera.
+The RPi4 runs as the ROS slave. The RPi4 is configured to communicate with the
+grasper's microcontroller(s) as well as the grasper's camera.
 
 ### Platform Requirements:
 
@@ -135,9 +135,7 @@ user interaction takes place. A laptop runs a GUI that allows a user to view
 sensor information and send requests to the hardware. The laptop also allows to
 a more permanent location.
 
-## Network SW Architecture Documentation
-
-### ROS Messages
+## ROS Messages
 
 Custom messages are designed to pass information around from the serial node.
 The following messages are currently defined in
@@ -145,13 +143,13 @@ The following messages are currently defined in
 
 - **ImpedanceDataMessage, ThermistorMessage, UltrasonicDataMessage,
   PulseOxRxMessage**: Similar message structures, contains a timestamped chunk
-  of data that would be packaged and sent up from the embedded system.
+  of data that would be packaged and sent up from the microcontroller.
 - **MotorMessageFeedback**: Contains a timestamped force and position
   measurement.
 - **SensorRequestMessage**: Contains flags for enabling different sensors (aside
   from sensors owned by the grasper's motor controller) as well as an "index"
   associated with the sensor measurement that may be used signal different modes
-  (to be used by the embedded system). This message type is sent by the GUI
+  (to be used by the microcontroller). This message type is sent by the GUI
   node.
 - **MotorRequestMessage**: Contains a desired force and whether or not the motor
   controller should be active. This message type is sent by the GUI node.
@@ -162,7 +160,7 @@ send out a message at a perscribed rate to signify that the serial node is
 running and not in a fail state so that this information may be processed and
 displayed by the GUI.
 
-#### Adding Another Custom ROS Message
+### Adding Another Custom ROS Message
 
 Persumabely in the future, we would like to modify the network and serial
 handler to handle different messages. The following describes how to add a ROS
@@ -185,9 +183,39 @@ that of the message.
   `rosnetwork_slave/catkin_ws` (! important, the `grasper_msg` directory in
   `rosnetwork_slave` is a symbolic link to that in `rosnetwork_slave` !).
 
-### Serial Node
+Alternatively, if instead of creating an RX callback you want to send a ROS
+message across the serial node, assuming you have created a message do the
+following:
+- In `rosnetwork_master/catkin_ws/src/serial_pkg/src/serial_node.py`, add a
+  function that receives a ROS message and packages it into an array of bytes
+  (use `struct.pack` for simplicity).
+- In the same file, add a subscriber in the `SerialNode`'s `__init__` function.
+  You can then connect to this when the network is running and messages
+  published will be sent to the microcontroller.
 
-TODO
+## Serial Parser
+
+The serial node utilizes a serial parser to parse and construct serial messages.
+The serial parser by default connects to `/dev/ttyS0`. The serial parser is
+defined by the state machine as shown below.
+
+<img src="imgs/serial_state_machine.png" width=500px>
+
+The state machine parses the following message structure:
+
+| Starting offset (bytes) | Length (bytes) | Name           | Description |
+| ----------------------- | -------------- | -------------- | --- |
+| 0                       | 1              | Head byte high | First of two head bytes |
+| 1                       | 1              | Head byte low  | Second head byte |
+| 2                       | 2              | Length         | 16 bit length of the message in little endian, expected to be between `[0, 2**16)` |  
+| 4                       | 1              | Type           | Unique message identifier, expected to be an element in the `receiveHandlers` dict |
+| 5                       | Length (n)     | Data           | The actual data |
+| 6 + n                   | 2              | CRC16          | CRC value in little endian, checksumming the entire messsage (excluding head bytes) |
+
+The serial node uses this parser to interpret messages sent by the
+microcontroller. See [Adding Another Custom ROS
+Message](#Adding-Another-Custom-ROS-Message) for information on how to interact
+with the serial node.
 
 ## GUI SW Architecture Documentation
 
@@ -200,12 +228,12 @@ the following requirements:
   node.
 - Graph any selected sensor measurement data.
 - Select which sensors to run. This data must be requisitioned and passed into
-  the ROS network to be sent to the embedded system by the serial node.
+  the ROS network to be sent to the microcontroller by the serial node.
   Furthermore, an id shall be associated with a sensor measurement request that
   shall be used by sensors to go into particular modes.
 - Easily "select all" sensors at once.
-- Easily input a particular desired motor force to be used by the embedded
-  system's force controller.
+- Easily input a particular desired motor force to be used by the
+  microcontroller's force controller.
 - Have logic behind which switches shall be enabled and which shall be disabled
   depending on the current state of the GUI and system.
 - Have the ability to display different types of errors. In particular, a
