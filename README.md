@@ -79,13 +79,14 @@ where `LAPTOP_IP_ADDR` is the static ip address of the laptop you configured ear
 Now, on the RPi, open `~/.bashrc` and add the following:
 ```bash
 export ROS_MASTER_URI=http://$LAPTOP_IP_ADDR:11311/
-export ROS_HOSTNAME=$LAPTOP_IP_ADDR
-export ROS_IP=$LAPTOP_IP_ADDR
+export ROS_HOSTNAME=$RPI_IP_ADDR
+export ROS_IP=$RPI_IP_ADDR
 ```
 where `LAPTOP_IP_ADDR` is the static ip address of the laptop you configured
-earlier. Note that the only thing different from the RPi is the first line.
+earlier and `RPI_IP_ADDR` is the static ip address of the RPi you configured
+earlier.
 
-### Synchronizing RPi's slock with laptop
+### Synchronizing RPi's clock with laptop
 
 To synchronize the RPi4's clock with the laptop, `sudo apt-get install chrony`
 and then add this line to `/etc/chrony/chrony.conf`:
