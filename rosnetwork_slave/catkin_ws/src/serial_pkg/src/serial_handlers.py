@@ -29,8 +29,7 @@ class MotorInfoHandler:
 
     def __call__(self, msg):
         try:
-            data = struct.unpack("<ff", msg)
-            time = struct.unpack("<L", msg[2])
+            data = struct.unpack("<ffL", msg)
         except struct.error as e:
             rospy.logerr("invalid motor info message")
             return
@@ -38,7 +37,7 @@ class MotorInfoHandler:
         feedback = MotorMessageFeedback()
         feedback.jawPos = data[0]
         feedback.appliedForce = data[1]
-        feedback.time = time[0]
+        feedback.time = data[2]
 
         self.pub.publish(feedback)
 
@@ -49,9 +48,10 @@ class ThermistorMessageHandler:
     def __call__(self, msg):
         structuredMsg = ThermistorMessage()
         try:
-            for i in len(50):
-                structuredMsg.dataPoint.data[i] = struct.unpack("<f", msg[2 * i])
-                structuredMsg.dataPoint.time[i] = struct.unpack("<L", msg[2 * (i + 1)])
+            for i in range(50):
+                tup = struct.unpack('<fL', msg[(8 * i) : (8 * i + 8)])
+                structuredMsg.dataPoint[i].data = tup[0]
+                structuredMsg.dataPoint[i].time = tup[1]
         except struct.error as e:
             rospy.logerr("invalid thermistor data message")
             return
@@ -65,9 +65,11 @@ class PulseOxMessageHandler:
     def __call__(self, msg):
         structuredMsg = PulseOxRxMessage()
         try:
-            for i in len(50):
-                structuredMsg.dataPoint.data[i] = struct.unpack("<f", msg[2 * i])
-                structuredMsg.dataPoint.time[i] = struct.unpack("<L", msg[2 * (i + 1)])
+            for i in range(50):
+                # insert janky parsing here :)
+                tup = struct.unpack('<fL', msg[(8 * i) : (8 * i + 8)])
+                structuredMsg.dataPoint[i].data = tup[0]
+                structuredMsg.dataPoint[i].time = tup[1]
         except struct.error as e:
             rospy.logerr("invalid pulse ox data message")
             return
@@ -81,9 +83,10 @@ class UltrasonicMessageHandler:
     def __call__(self, msg):
         structuredMsg = UltrasonicDataMessage()
         try:
-            for i in len(50):
-                structuredMsg.dataPoint.data[i] = struct.unpack("<f", msg[2 * i])
-                structuredMsg.dataPoint.time[i] = struct.unpack("<L", msg[2 * (i + 1)])
+            for i in range(50):
+                tup = struct.unpack('<fL', msg[(8 * i) : (8 * i + 8)])
+                structuredMsg.dataPoint[i].data = tup[0]
+                structuredMsg.dataPoint[i].time = tup[1]
         except struct.error as e:
             rospy.logerr("invalid ultrasonic data message")
             return
@@ -97,23 +100,24 @@ class ImpedanceMessageHandler:
     def __call__(self, msg):
         structuredMsg = ImpedanceDataMessage()
         try:
-            for i in len(50):
-                structuredMsg.dataPoint.data[i] = struct.unpack("<f", msg[2 * i])
-                structuredMsg.dataPoint.time[i] = struct.unpack("<L", msg[2 * (i + 1)])
+            for i in range(50):
+                tup = struct.unpack('<fL', msg[(8 * i) : (8 * i + 8)])
+                structuredMsg.dataPoint[i].data = tup[0]
+                structuredMsg.dataPoint[i].time = tup[1]
         except struct.error as e:
             rospy.logerr("invalid impedance data message")
             return
 
         self.pub.publish(structuredMsg)
 
-class MCUConnectedHandler
+class MCUConnectedHandler:
     def __init__(self):
-        self.pub = rospy.Publisher("serial/mcuConnected", Bool, queue_size=1)
+        self.pub = rospy.Publisher('serial/mcuConnectedHandler', Bool, queue_size=10)
     
     def __call__(self, msg):
         structuredMsg = Bool()
         try:
-            structuredMsg.data = struct.unpack("?", msg[0])
+            structuredMsg.data = struct.unpack("?", msg[0])[0]
         except struct.error as e:
             rospy.logerr("invalid mcu connected message")
             return
