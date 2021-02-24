@@ -6,6 +6,7 @@ import rospy
 import serial_handlers
 import serial_parser
 import time
+import struct
 
 MOTOR_REQUEST_TX_TYPE = 0
 SENSOR_ENABLE_TX_TYPE = 1
@@ -30,8 +31,8 @@ class SerialNode:
             self.socket.listen()
             rate.sleep()
 
-    def sendMotorRequest(self, msg):    
-        data = struct.pack("<f??", msg.angle, msg.enableMotorController, msg.measureForce)
+    def sendMotorRequest(self, msg):
+        data = struct.pack("<f??", msg.appliedForce, msg.enableMotorController, msg.measureForce)
         self.socket.sendMessage(data, MOTOR_REQUEST_TX_TYPE)
 
     def sendSensorEnableRequest(self, msg):

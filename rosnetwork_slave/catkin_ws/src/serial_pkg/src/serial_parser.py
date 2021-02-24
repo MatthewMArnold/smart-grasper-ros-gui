@@ -3,6 +3,7 @@
 import time
 import crc
 import serial
+import rospy
 import struct
 
 WAIT_HEAD_BYTE_H = 0
@@ -53,7 +54,6 @@ class SerialSocket:
             if self.rxState == WAIT_HEAD_BYTE_H:
                 if self.port.in_waiting <= 0:
                     return
-
                 byte = struct.unpack('B', self.port.read())[0]
                 if byte == self.HEADER_BYTE_H:
                     self.rxState = WAIT_HEAD_BYTE_L
