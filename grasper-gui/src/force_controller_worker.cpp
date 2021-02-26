@@ -38,7 +38,7 @@ void ForceControllerWorker::setForceActual(double force, double time)
         m_forceActual = force;
         if (m_measureForceRequest)
         {
-            emit onForceActualChanged(limitedNum(m_forceActual));
+            emit onForceActualChanged(limitedNum(3.2));
         }
     }
     if (m_measureForceRequest)
@@ -72,10 +72,9 @@ void ForceControllerWorker::setMeasureForceRequest(bool measureForceRequest, int
     qDebug() << "force requested set to: " << measureForceRequest;
     m_requestMutex.lock();
     m_measureForceRequest = measureForceRequest;
-    double forceDesired = m_forceDesired = m_forceDesired;
     bool squeeze = m_squeeze;
     m_requestMutex.unlock();
-    sendMotorRequest(forceDesired, squeeze, measureForceRequest);
+    sendMotorRequest(m_forceDesired, squeeze, measureForceRequest);
 }
 
 void ForceControllerWorker::addConnections(QObject *root)

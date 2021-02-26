@@ -119,7 +119,7 @@ Column {
                 objectName: "impedanceSwitch"
                 anchors.right: parent.right
                 anchors.rightMargin: Constants.component_margin
-                side_text: "Impedance"
+                side_text: "Impedance/Phase Angle"
             }
         }
     }

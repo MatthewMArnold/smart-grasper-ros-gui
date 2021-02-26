@@ -119,8 +119,8 @@ Rectangle {
         objectName: "sensorReadingsLeftCol"
         anchors.left: motorControlPanel.right
         anchors.leftMargin: Constants.screen_margin
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: Constants.screen_margin
+        anchors.top: pulsePanel.bottom
+        anchors.topMargin: Constants.screen_margin
         width: Constants.default_measurement_panel_wdith
         spacing: Constants.component_margin
 
@@ -143,7 +143,7 @@ Rectangle {
         SensorReadingV2 {
             objectName: "impedance"
             anchors.horizontalCenter: parent.horizontalCenter
-            sensor_heading: "Impedance\n(todo)"
+            sensor_heading: "Impedance (\u2126)"
             sensor_reading: "0"
             exclusiveGroup: graphDisplayButtonGroup
         }
@@ -176,7 +176,7 @@ Rectangle {
         SensorReadingV2 {
             objectName: "temperature"
             anchors.horizontalCenter: parent.horizontalCenter
-            sensor_heading: "Temperature (C)"
+            sensor_heading: "Temperature (\u00B0C)"
             sensor_reading: "0"
             exclusiveGroup: graphDisplayButtonGroup
         }
@@ -187,6 +187,14 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             sensor_heading: "Oxygen Level (%)"
             sensor_reading: "0"
+            exclusiveGroup: graphDisplayButtonGroup
+        }
+
+        SensorReadingV2 {
+            objectName: "phaseAngle"
+            anchors.horizontalCenter: parent.horizontalCenter
+            sensor_heading: "Phase Angle (Degrees)"
+            sensor_reading: "0.00"
             exclusiveGroup: graphDisplayButtonGroup
         }
     }
@@ -204,14 +212,14 @@ Rectangle {
                Constants.component_margin +
                motorControlPanel.width -
                runAllSensorsButtonShadow.shadow_offset
-        height: sensorReadingsLeftCol.height - measurementPanel.height
+        height: sensorReadingsRightCol.height - measurementPanel.height - Constants.component_margin * 2
         button_corner_radius: height / 2
 
         primary_color: Constants.light_green
         selected_color: Constants.light_red
 
         button_text: "RUN ALL SENSORS"
-        text_size: Constants.medium_text_size
+        text_size: Constants.large_text_size
         text_bold: true
         primary_text_color: Constants.dark_green
         selected_text_color: Constants.dark_red
@@ -289,7 +297,7 @@ Rectangle {
         Text {
             anchors.centerIn: parent
             color: Constants.primary_font_color
-            text: ""
+            text: "Graphed Data"
             font.weight: Font.ExtraBold
             horizontalAlignment: Text.AlignHCenter
             font.pixelSize: 20

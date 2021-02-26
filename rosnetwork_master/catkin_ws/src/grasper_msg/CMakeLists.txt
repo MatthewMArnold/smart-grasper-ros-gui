@@ -59,6 +59,7 @@ add_message_files(
   TimestampedFloat.msg
   UltrasonicDataMessage.msg
   ImpedanceDataMessage.msg
+  PhaseAngleMessage.msg
 )
 
 ## Generate services in the 'srv' folder

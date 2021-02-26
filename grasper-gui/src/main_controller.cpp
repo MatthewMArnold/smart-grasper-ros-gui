@@ -50,6 +50,7 @@ MainController::~MainController()
     delete ultrasonic;
     delete bioimpedance;
     delete sensorRequest;
+    delete phaseAngle;
 }
 
 void MainController::teensyConnectedMsgCallback(const std_msgs::Bool &msg)
@@ -73,6 +74,7 @@ void MainController::initialize(QQmlApplicationEngine *engine)
     pulseox = new PulseoxMeasurement();
     ultrasonic = new UltrasonicMeasurement();
     bioimpedance = new ImpedanceMeasurement();
+    phaseAngle = new PhaseAngleMeasurement();
     sensorRequest = new SensorRequestWorker();
 
     engine->rootContext()->setContextProperty("forceController", forceController);
@@ -133,6 +135,15 @@ void MainController::addConnections(QObject *root)
         impedanceMeasurement,
         graph,
         impedanceRadioButton,
+        root->findChild<QObject *>("impedanceSwitch"));
+
+    QObject *phaseAngleRadioButton = root->findChild<QObject *>("phaseAngle");
+    ValueUpdater *phaseAngleMeasurement =
+        qobject_cast<ValueUpdater *>(phaseAngleRadioButton->findChild<QObject *>("sensorReading"));
+    phaseAngle->addConnections(
+        phaseAngleMeasurement,
+        graph,
+        phaseAngleRadioButton,
         root->findChild<QObject *>("impedanceSwitch"));
 
     graph->initCustomPlot();

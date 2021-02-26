@@ -83,26 +83,26 @@ Rectangle {
                 text_bold: true
             }
 
-            ColoredButton {
-                id: sandboxButton
-                onToggledChanged: {
-                    if (toggled) {
-                        curr_state = "sandboxButton"
-                    }
-                }
-                height: Constants.side_bar_button_height
-                width: parent.width
-                anchors.horizontalCenter: parent.horizontalCenter
-                button_corner_radius: Constants.default_large_edge_radius
-                primary_color: Constants.dark_purple
-                selected_color: Constants.light_purple
-                selected_text_color: Constants.dark_purple
-                text_size: Constants.medium_text_size
-                primary_text_color: Constants.light_purple
-                button_text: "sandbox"
-                user_untoggable: false
-                text_bold: true
-            }
+//            ColoredButton {
+//                id: sandboxButton
+//                onToggledChanged: {
+//                    if (toggled) {
+//                        curr_state = "sandboxButton"
+//                    }
+//                }
+//                height: Constants.side_bar_button_height
+//                width: parent.width
+//                anchors.horizontalCenter: parent.horizontalCenter
+//                button_corner_radius: Constants.default_large_edge_radius
+//                primary_color: Constants.dark_purple
+//                selected_color: Constants.light_purple
+//                selected_text_color: Constants.dark_purple
+//                text_size: Constants.medium_text_size
+//                primary_text_color: Constants.light_purple
+//                button_text: "sandbox"
+//                user_untoggable: false
+//                text_bold: true
+//            }
         }
     }
 }

@@ -5,6 +5,7 @@
 #include <grasper_msg/PulseOxRxMessage.h>
 #include <grasper_msg/ThermistorMessage.h>
 #include <grasper_msg/UltrasonicDataMessage.h>
+#include <grasper_msg/PhaseAngleMessage.h>
 
 #include "sensor_measurement.hpp"
 
@@ -39,6 +40,13 @@ class ThermistorMeasurement : public SensorMeasurement
 public:
     ThermistorMeasurement();
     void msgCallback(const grasper_msg::ThermistorMessage &msg);
+};
+
+class PhaseAngleMeasurement : public SensorMeasurement
+{
+public:
+    PhaseAngleMeasurement();
+    void msgCallback(const grasper_msg::PhaseAngleMessage &msg);
 };
 
 #endif  // SENSOR_MEASUREMENT_INSTANCES_HPP_

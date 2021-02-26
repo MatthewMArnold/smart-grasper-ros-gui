@@ -135,7 +135,7 @@ The following messages are currently defined in
 `rosnetwork_master/catkin_ws/src/grasper_msg/msg`:
 
 - **ImpedanceDataMessage, ThermistorMessage, UltrasonicDataMessage,
-  PulseOxRxMessage**: Similar message structures, contains a timestamped chunk
+  PulseOxRxMessage, PhaseAngleMessage**: Similar message structures, contains a timestamped chunk
   of data that would be packaged and sent up from the microcontroller.
 - **MotorMessageFeedback**: Contains a timestamped force and position
   measurement.

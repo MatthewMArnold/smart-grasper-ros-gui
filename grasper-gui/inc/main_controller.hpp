@@ -93,6 +93,7 @@ private:
     PulseoxMeasurement *pulseox;
     UltrasonicMeasurement *ultrasonic;
     ImpedanceMeasurement *bioimpedance;
+    PhaseAngleMeasurement *phaseAngle;
     SensorRequestWorker *sensorRequest;
 
     // Threads
