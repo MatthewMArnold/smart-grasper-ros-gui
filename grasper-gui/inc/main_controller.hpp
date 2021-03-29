@@ -6,6 +6,7 @@
 #include <QQmlApplicationEngine>
 #include <QThread>
 #include <QTimer>
+#include <grasper_msg/MCUConnectedMessage.h>
 #include <grasper_msg/SensorRequestMessage.h>
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
@@ -59,7 +60,7 @@ public:
 
     bool teensyConnected() const { return m_teensyConnected; }
 
-    void teensyConnectedMsgCallback(const std_msgs::Bool &msg);
+    void teensyConnectedMsgCallback(const grasper_msg::MCUConnectedMessage &msg);
 
     void serialNodeConnectedMsgCallback(const std_msgs::Bool &msg);
 

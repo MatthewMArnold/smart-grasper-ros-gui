@@ -1,1 +1,1 @@
-TimestampedFloat[50] dataPoint
+TimestampedFloat dataPoint

@@ -101,7 +101,7 @@ UltrasonicMeasurement::UltrasonicMeasurement() : SensorMeasurement("Velocity of 
 
 void UltrasonicMeasurement::msgCallback(const grasper_msg::UltrasonicDataMessage &msg)
 {
-    constexpr int MSG_LEN = 50;
+    constexpr int MSG_LEN = 100;
     double avgX = 0;
     for (int i = 0; i < MSG_LEN; i++)
     {
@@ -137,16 +137,9 @@ ThermistorMeasurement::ThermistorMeasurement() : SensorMeasurement("Temperature 
 
 void ThermistorMeasurement::msgCallback(const grasper_msg::ThermistorMessage &msg)
 {
-    constexpr int MSG_LEN = 50;
-    double avgX = 0;
-    for (int i = 0; i < MSG_LEN; i++)
+    if (m_currAvgValue != msg.dataPoint.data)
     {
-        avgX += msg.dataPoint[i].data;
-    }
-    avgX /= static_cast<double>(MSG_LEN);
-    if (m_currAvgValue != avgX)
-    {
-        m_currAvgValue = avgX;
+        m_currAvgValue = msg.dataPoint.data;
         if (this->getMeasurementRequested())
         {
             emit onMeasurementChanged(limitedNum(m_currAvgValue));
@@ -154,10 +147,9 @@ void ThermistorMeasurement::msgCallback(const grasper_msg::ThermistorMessage &ms
     }
     if (this->getMeasurementRequested())
     {
-        bool gc = this->getGraphControl();
-        if (gc)
+        if (this->getGraphControl())
         {
-            emit onMeasurementChangedWithTime(m_currAvgValue, msg.dataPoint[MSG_LEN - 1].time);
+            emit onMeasurementChangedWithTime(m_currAvgValue, msg.dataPoint.time);
         }
     }
 }

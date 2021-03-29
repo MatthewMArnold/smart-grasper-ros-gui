@@ -53,10 +53,10 @@ MainController::~MainController()
     delete phaseAngle;
 }
 
-void MainController::teensyConnectedMsgCallback(const std_msgs::Bool &msg)
+void MainController::teensyConnectedMsgCallback(const grasper_msg::MCUConnectedMessage &msg)
 {
     emit teensyConnectedMsgReceived();
-    if (msg.data) setTeensyConnected(true);
+    if (msg.connected) setTeensyConnected(true);
 }
 
 void MainController::serialNodeConnectedMsgCallback(const std_msgs::Bool &msg)

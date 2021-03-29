@@ -60,6 +60,7 @@ add_message_files(
   UltrasonicDataMessage.msg
   ImpedanceDataMessage.msg
   PhaseAngleMessage.msg
+  MCUConnectedMessage.msg
 )
 
 ## Generate services in the 'srv' folder
