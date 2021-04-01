@@ -51,41 +51,6 @@ class MotorDebugInfoHandler:
 
         self.pub.publish(feedback)
 
-# class MotorInfoHandler:
-#     def __init__(self):
-#         self.pub = rospy.Publisher("serial/motorFeedback", MotorMessageFeedback, queue_size=1)
-
-#     def __call__(self, msg):
-#         try:
-#             data = struct.unpack("<ffL", msg)
-#         except struct.error as e:
-#             rospy.logerr("invalid motor info message")
-#             return
-
-#         feedback = MotorMessageFeedback()
-#         feedback.jawPos = data[0]
-#         feedback.appliedForce = data[1]
-#         feedback.time = data[2]
-
-#         self.pub.publish(feedback)
-
-# class ThermistorMessageHandler:
-#     def __init__(self):
-#         self.pub = rospy.Publisher("serial/thermistorData", ThermistorMessage, queue_size=1)
-
-#     def __call__(self, msg):
-#         structuredMsg = ThermistorMessage()
-#         try:
-#             for i in range(50):
-#                 tup = struct.unpack('<fL', msg[(8 * i) : (8 * i + 8)])
-#                 structuredMsg.dataPoint[i].data = tup[0]
-#                 structuredMsg.dataPoint[i].time = tup[1]
-#         except struct.error as e:
-#             rospy.logerr("invalid thermistor data message")
-#             return
-
-#         self.pub.publish(structuredMsg)
-
 class PulseOxMessageHandler:
     def __init__(self):
         self.pub = rospy.Publisher("serial/pulseOxData", PulseOxRxMessage, queue_size=1)
@@ -146,11 +111,11 @@ class MCUConnectedHandler:
         self.pub = rospy.Publisher('serial/mcuConnectedHandler', MCUConnectedMessage, queue_size=10)
     
     def __call__(self, msg):
-        structuredMsg = Bool()
+        structuredMsg = MCUConnectedMessage()
         try:
-            msg = struct.unpack("?L", msg)
-            structuredMsg.connected = msg[0]
-            structuredMsg.time = msg[1]
+            msgFormatted = struct.unpack("<?L", msg)
+            structuredMsg.connected = msgFormatted[0]
+            structuredMsg.time = msgFormatted[1]
         except struct.error as e:
             rospy.logerr("invalid mcu connected message")
             return
@@ -159,8 +124,6 @@ class MCUConnectedHandler:
 
 receiveHandlers = {
     0: MotorDebugInfoHandler(),
-    1: MotorInfoHandler(),
-    2: ThermistorMessageHandler(),
     3: PulseOxMessageHandler(),
     4: UltrasonicMessageHandler(),
     5: ImpedanceMessageHandler(),
