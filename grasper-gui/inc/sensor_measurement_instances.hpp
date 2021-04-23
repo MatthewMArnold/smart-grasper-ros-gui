@@ -2,10 +2,10 @@
 #define SENSOR_MEASUREMENT_INSTANCES_HPP_
 
 #include <grasper_msg/ImpedanceDataMessage.h>
+#include <grasper_msg/PhaseAngleMessage.h>
 #include <grasper_msg/PulseOxRxMessage.h>
 #include <grasper_msg/ThermistorMessage.h>
 #include <grasper_msg/UltrasonicDataMessage.h>
-#include <grasper_msg/PhaseAngleMessage.h>
 
 #include "sensor_measurement.hpp"
 

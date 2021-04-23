@@ -61,6 +61,7 @@ add_message_files(
   ImpedanceDataMessage.msg
   PhaseAngleMessage.msg
   MCUConnectedMessage.msg
+  CameraRequestMessage.msg
 )
 
 ## Generate services in the 'srv' folder

@@ -15,6 +15,7 @@
 #include "sensor_measurement_instances.hpp"
 
 class ForceControllerWorker;
+class ImageDisplayButton;
 
 /**
  * Thread that publishes sensor requests to '/serial/sensorEnable'
@@ -96,6 +97,7 @@ private:
     ImpedanceMeasurement *bioimpedance;
     PhaseAngleMeasurement *phaseAngle;
     SensorRequestWorker *sensorRequest;
+    ImageDisplayButton *imageDisplayButton;
 
     // Threads
     QThread forceControllerThread;

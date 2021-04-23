@@ -1,7 +1,8 @@
 #include "sensor_measurement_instances.hpp"
 
-#include <QDebug>
 #include <cmath>
+
+#include <QDebug>
 
 #include "main_controller.hpp"
 

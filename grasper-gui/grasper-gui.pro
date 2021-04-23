@@ -27,7 +27,8 @@ SOURCES += \
     src/image_displayer.cpp \
     src/value_updater.cpp \
     src/sensor_measurement.cpp \
-    src/sensor_measurement_instances.cpp
+    src/sensor_measurement_instances.cpp \
+    src/image_display_button.cpp
 
 INCLUDEPATH += \
     inc \
@@ -43,7 +44,8 @@ HEADERS += \
     inc/error_reporter.hpp \
     inc/value_updater.hpp \
     inc/sensor_measurement.hpp \
-    inc/sensor_measurement_instances.hpp
+    inc/sensor_measurement_instances.hpp \
+    inc/image_display_button.hpp
 
 RESOURCES += \
     resources.qrc

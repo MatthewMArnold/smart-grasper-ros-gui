@@ -1,0 +1,2 @@
+int32 cameraFramesToCapture
+int32 cameraFrameCaptureRate

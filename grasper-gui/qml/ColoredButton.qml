@@ -76,7 +76,6 @@ Button {
         text: ""
         anchors.centerIn: parent
         color: primary_text_color
-        font.pixelSize: text_size
         font.bold: false
     }
 

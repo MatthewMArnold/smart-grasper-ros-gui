@@ -6,6 +6,7 @@
 #include "custom_plot_item.hpp"
 #include "error_controller.hpp"
 #include "force_controller_worker.hpp"
+#include "image_display_button.hpp"
 
 void SensorRequestWorker::run()
 {
@@ -51,6 +52,7 @@ MainController::~MainController()
     delete bioimpedance;
     delete sensorRequest;
     delete phaseAngle;
+    delete imageDisplayButton;
 }
 
 void MainController::teensyConnectedMsgCallback(const grasper_msg::MCUConnectedMessage &msg)
@@ -76,6 +78,7 @@ void MainController::initialize(QQmlApplicationEngine *engine)
     bioimpedance = new ImpedanceMeasurement();
     phaseAngle = new PhaseAngleMeasurement();
     sensorRequest = new SensorRequestWorker();
+    imageDisplayButton = new ImageDisplayButton();
 
     engine->rootContext()->setContextProperty("forceController", forceController);
 
@@ -151,6 +154,8 @@ void MainController::addConnections(QObject *root)
     connect(&forceControllerThread, &QThread::finished, forceController, &QObject::deleteLater);
     forceController->moveToThread(&forceControllerThread);
     forceController->start();
+
+    imageDisplayButton->addConnections(root);
 
     QObject::connect(
         &m_teensyConnectedTimeout,

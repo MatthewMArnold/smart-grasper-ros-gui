@@ -1,5 +1,6 @@
 import QtQuick 2.9
 import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
 import CustomPlot 1.0
 import ImageDisplayer 1.0
 import "qrc:/qml"
@@ -147,12 +148,45 @@ Rectangle {
             sensor_reading: "0"
             exclusiveGroup: graphDisplayButtonGroup
         }
+
         Rectangle {
-            id: spacer
-            height: 10
-            width: parent.width
-            opacity: 0
+            anchors.horizontalCenter: parent.horizontalCenter
+            height: 90
+            width: Constants.default_measurement_panel_wdith
+            color: Constants.subsection_background_color
+            radius: Constants.default_large_edge_radius
+            border.width: 0
+
+            Button {
+                anchors.centerIn: parent
+                objectName: "cameraButton"
+
+                Text {
+                    id: header
+                    text: "Capture\nImage"
+                    color: Constants.subsection_background_color
+                    font.weight: Font.Bold
+                    anchors.centerIn: parent
+                    anchors.topMargin: Constants.component_margin * 2
+                    font.pixelSize: Constants.small_text_size
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                style: ButtonStyle {
+                    background: Rectangle {
+                        implicitWidth: 100
+                        implicitHeight: 50
+                        border.width: control.activeFocus ? 2 : 1
+                        radius: Constants.default_small_edge_radius
+                        gradient: Gradient {
+                            GradientStop { position: 0 ; color: control.pressed ? Constants.dark_purple : Constants.light_purple }
+                            GradientStop { position: 1 ; color: control.pressed ? Constants.dark_purple : Constants.light_purple }
+                        }
+                    }
+                }
+            }
         }
+
     }
 
     Column {
